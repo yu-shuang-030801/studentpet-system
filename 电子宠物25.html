@@ -1,0 +1,3067 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习伴侣系统 | 好课在线 | 好老师 提升快</title>
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --primary-dark: #357ABD;
+            --accent: #9D4EDD;
+            --success: #2ECC71;
+            --warning: #FFD166;
+            --danger: #FF4757;
+            --gray-light: #F5F5F5;
+            --gray: #9CA3AF;
+            --dark: #1F2937;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .game-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD166, #FF6B6B, #4A90E2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .control-panel, .game-panel, .batch-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .panel-title {
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+        
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+        
+        .pets-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .pets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .pet-card {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .pet-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.15);
+        }
+        
+        .pet-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(157, 78, 221, 0.1));
+        }
+        
+        .pet-card-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 8px;
+        }
+        
+        .pet-card-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        
+        .pet-card-info {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        
+        .pet-card-level {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .pet-card-student {
+            font-size: 0.7rem;
+            color: var(--gray);
+            text-align: center;
+            margin-top: 4px;
+        }
+        
+        .link-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            position: absolute;
+            top: 8px;
+            right: 32px;
+        }
+        
+        .link-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+        
+        .delete-btn:hover {
+            background: #ff2e43;
+            transform: scale(1.1);
+        }
+        
+        .add-pet-section {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.05), rgba(157, 78, 221, 0.05));
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(74, 144, 226, 0.2);
+        }
+        
+        .student-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .form-input,
+        .form-textarea,
+        .form-select {
+            padding: 10px 12px;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            background: white;
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(74, 144, 226, 0.1);
+        }
+        
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), #8A2BE2);
+            color: white;
+        }
+        
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(157, 78, 221, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #FF2E43);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+        }
+        
+        .btn-csv {
+            background: linear-gradient(135deg, #2ECC71, #27AE60);
+            color: white;
+        }
+        
+        .btn-csv:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+        }
+        
+        .pet-display {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            border-radius: var(--border-radius);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .pet-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            margin: 0 auto 15px;
+            border: 4px solid white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .pet-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .pet-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .pet-name:hover {
+            color: var(--primary);
+        }
+        
+        .pet-gender {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .gender-male {
+            background: linear-gradient(135deg, #4A90E2, #357ABD);
+            color: white;
+        }
+        
+        .gender-female {
+            background: linear-gradient(135deg, #FF6B6B, #FF4757);
+            color: white;
+        }
+        
+        .pet-type {
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .change-pet-panel {
+            background: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .pet-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stat-name {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .stat-value {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .study-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .study-stat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .study-stat-icon {
+            font-size: 1.3rem;
+            margin-right: 12px;
+        }
+        
+        .study-stat-info {
+            flex: 1;
+        }
+        
+        .study-stat-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .study-stat-count {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .action-panel {
+            margin-bottom: 20px;
+        }
+        
+        .action-title {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .action-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .action-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .action-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.15);
+        }
+        
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .action-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        
+        .action-desc {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .growth-log {
+            background: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--gray-light);
+            font-size: 0.85rem;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-time {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        
+        .data-management {
+            background: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+        }
+        
+        .data-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .data-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .batch-input-group {
+            margin-bottom: 15px;
+        }
+        
+        .batch-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+        
+        .batch-hint {
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-align: center;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: var(--gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .import-section {
+            background: linear-gradient(135deg, rgba(255, 215, 102, 0.1), rgba(255, 107, 107, 0.1));
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 215, 102, 0.2);
+            margin-top: 20px;
+        }
+        
+        .import-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .import-btn {
+            flex: 1;
+        }
+        
+        .import-hint {
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-align: center;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .result-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .result-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .result-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-light);
+            font-size: 0.85rem;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal-close {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .modal-close:hover {
+            background: #ff2e43;
+            transform: scale(1.1);
+        }
+        
+        .csv-template {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .csv-template code {
+            font-family: 'Courier New', monospace;
+            color: var(--primary-dark);
+        }
+        
+        .help-content {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .help-content h4 {
+            color: var(--primary);
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .help-content ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .help-content li {
+            margin-bottom: 5px;
+        }
+        
+        .error-message {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .success-message {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        /* ===== 新增：链接生成面板 ===== */
+        .link-panel {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), rgba(74, 144, 226, 0.05));
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            margin-top: 15px;
+        }
+        
+        .link-result {
+            background: #f0f8ff;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        
+        .link-text {
+            word-break: break-all;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            margin: 6px 0;
+            display: block;
+        }
+        
+        /* ===== 新增：日报面板 ===== */
+        .daily-report-panel {
+            background: linear-gradient(135deg, rgba(255, 215, 102, 0.05), rgba(157, 78, 221, 0.05));
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 215, 102, 0.2);
+            margin-top: 15px;
+        }
+        
+        .report-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .report-actions .btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+        
+        /* ===== 新增：教师寄语面板 ===== */
+        .comment-panel {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.05), rgba(255, 107, 107, 0.05));
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            margin-top: 15px;
+        }
+        
+        /* ===== 新增：排行榜面板 ===== */
+        .ranking-panel {
+            background: linear-gradient(135deg, rgba(255, 215, 102, 0.08), rgba(255, 107, 107, 0.08));
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 215, 102, 0.25);
+            margin-top: 15px;
+        }
+        
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .ranking-rank {
+            font-size: 1.2rem;
+            font-weight: 700;
+            width: 36px;
+            text-align: center;
+        }
+        
+        .ranking-info {
+            flex: 1;
+            margin-left: 10px;
+        }
+        
+        .ranking-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .ranking-level {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .ranking-emoji {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="game-title">学习伴侣 | 好课在线 | 好老师 提升快</h1>
+            <p class="subtitle">Chemistry Learning Partner | 学习任务养成系统 | 支持200名学生 | 成长值=等级 | 6阶段进化</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="control-panel">
+                <h2 class="panel-title">🏆 学习伙伴排行榜</h2>
+                
+                <div class="search-bar">
+                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索学生或伙伴..." oninput="petSystem.filterPetsList(this.value)">
+                </div>
+                
+                <div class="pets-container">
+                    <div class="pets-grid" id="petsGrid"></div>
+                </div>
+                
+                <div class="add-pet-section">
+                    <h3 class="panel-title">➕ 批量添加学生</h3>
+                    <div class="student-form">
+                        <div class="form-group">
+                            <label class="form-label">学生姓名（每行一个，或逗号分隔）</label>
+                            <textarea id="batchStudentNames" class="form-textarea" placeholder="请输入学生姓名，每行一个
+例如：
+张三
+李四
+王五"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">班级</label>
+                            <input type="text" id="studentClass" class="form-input" placeholder="例如：高一(1)班">
+                        </div>
+                        <button id="addBatchStudentsBtn" class="btn btn-primary">批量添加学生（随机分配伙伴）</button>
+                    </div>
+                </div>
+                
+                <div class="import-section">
+                    <h3 class="panel-title">📁 CSV数据导入</h3>
+                    <div class="import-options">
+                        <button id="downloadTemplate" class="btn btn-csv import-btn">下载CSV模板</button>
+                        <label for="importFile" class="btn btn-accent import-btn" style="cursor: pointer; text-align: center;">
+                            导入CSV数据
+                        </label>
+                    </div>
+                    <div class="import-hint">支持.csv、.txt格式，自动识别字段</div>
+                </div>
+                
+                <!-- ===== 新增：学生链接生成面板 ===== -->
+                <div class="link-panel">
+                    <h3 class="panel-title">🔗 生成学生查看链接</h3>
+                    <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 10px;">
+                        选择学生 → 生成专属链接 → 发到企微/钉钉
+                    </p>
+                    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                        <select id="linkStudentSelect" class="form-select" style="flex: 1;">
+                            <option value="">-- 选择学生 --</option>
+                        </select>
+                        <button onclick="generateStudentLink()" class="btn btn-primary" style="white-space: nowrap;">
+                            🔗 生成链接
+                        </button>
+                    </div>
+                    <div id="linkResult" style="display: none;">
+                        <div style="margin-bottom: 6px; font-weight: 600; color: var(--primary); font-size: 0.85rem;">
+                            ✅ 学生专属链接（复制发到企微/钉钉）：
+                        </div>
+                        <code id="studentLinkText" class="link-text"></code>
+                        <button onclick="copyStudentLink()" class="btn btn-secondary" style="margin-top: 8px; width: 100%; font-size: 0.8rem; padding: 10px;">
+                            📋 一键复制链接
+                        </button>
+                    </div>
+                    <div id="linkResultAll" style="display: none; margin-top: 10px;">
+                        <div style="margin-bottom: 6px; font-weight: 600; color: var(--primary); font-size: 0.85rem;">
+                            ✅ 全部学生链接：
+                        </div>
+                        <textarea id="allLinksText" class="form-textarea" style="min-height: 80px; font-size: 0.75rem;" readonly></textarea>
+                        <button onclick="copyAllLinks()" class="btn btn-secondary" style="margin-top: 8px; width: 100%; font-size: 0.8rem; padding: 10px;">
+                            📋 一键复制全部链接
+                        </button>
+                    </div>
+                    <button onclick="generateAllLinks()" class="btn btn-accent" style="margin-top: 8px; width: 100%; font-size: 0.85rem; padding: 10px;">
+                        🔗 一键生成全部学生链接
+                    </button>
+                </div>
+            </div>
+            
+            <div class="game-panel">
+                <div id="emptyState" style="text-align: center; padding: 30px; display: block;">
+                    <div style="font-size: 4rem; margin-bottom: 15px;">📚</div>
+                    <h2 style="color: var(--primary); margin-bottom: 10px; font-size: 1.5rem;">欢迎使用化学学习伙伴系统</h2>
+                    <p style="color: var(--gray); font-size: 0.9rem;">请从左侧选择学习伙伴，或添加新的学生和伙伴</p>
+                </div>
+                
+                <div id="petManagement" style="display: none; height: 100%;">
+                    <div class="pet-display">
+                        <div class="pet-avatar" id="petAvatar">🐱</div>
+                        <div class="pet-info">
+                            <h1 id="currentPetName" class="pet-name">伙伴名字</h1>
+                            <div class="pet-gender gender-male" id="petGenderDisplay">♂</div>
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <span id="currentPetType" class="pet-type">🐱 阿伏伽德罗喵</span>
+                            <span id="petLevel" style="background: rgba(46,204,113,0.2); color: var(--success); padding: 3px 8px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-left: 8px;">Lv.1</span>
+                        </div>
+                        <div id="evolutionStage" style="color: var(--accent); font-weight: 600; font-size: 0.9rem; margin-bottom: 10px;">⭐ 化学小萌新</div>
+                    </div>
+                    
+                    <div class="change-pet-panel">
+                        <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1rem;">🔄 更换学习伙伴</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <div>
+                                <label class="form-label">伙伴类型</label>
+                                <select id="changePetType" class="form-select">
+                                    <option value="cat">🐱 阿伏伽德罗喵</option>
+                                    <option value="dog">🐶 氧化汪</option>
+                                    <option value="dragon">🐲 钠钠龙</option>
+                                    <option value="shrimp">🦐 氯氯虾</option>
+                                    <option value="rabbit">🐰 镁镁兔</option>
+                                    <option value="panda">🐼 方程式熊猫</option>
+                                    <option value="fox">🦊 镁铝狐</option>
+                                    <option value="bird">🐦 气体啾</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">伙伴性别</label>
+                                <select id="changePetGender" class="form-select">
+                                    <option value="male">♂ 男生</option>
+                                    <option value="female">♀ 女生</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="changePetBtn" class="btn btn-accent" style="width: 100%;">更换学习伙伴</button>
+                        <button id="deletePetBtn" class="btn btn-danger" style="width: 100%; margin-top: 8px;">删除当前学生</button>
+                    </div>
+                    
+                    <!-- ===== 新增：教师寄语 ===== -->
+                    <div class="comment-panel">
+                        <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1rem;">💬 给学生写寄语</h3>
+                        <p style="font-size: 0.75rem; color: var(--gray); margin-bottom: 8px;">
+                            学生会在这条寄语下方看到自己的宠物（URL 参数自动识别学生）
+                        </p>
+                        <textarea id="teacherComment" class="form-textarea" style="min-height: 60px;" placeholder="例如：方程式进步很大，继续加油！"></textarea>
+                        <button onclick="saveTeacherComment()" class="btn btn-primary" style="width: 100%; margin-top: 8px; font-size: 0.85rem; padding: 10px;">
+                            💾 保存寄语
+                        </button>
+                    </div>
+                    
+                    <div class="pet-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">
+                                <span class="stat-name">学习等级</span>
+                                <span class="stat-value"><span id="expValue">0</span> 级</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">
+                                <span class="stat-name">总成长值</span>
+                                <span class="stat-value"><span id="totalExp">0</span> 点</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">
+                                <span class="stat-name">进化阶段</span>
+                                <span class="stat-value" id="evolutionStageText">1/6</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="study-stats-grid" id="studyStats"></div>
+                    
+                    <div class="action-panel">
+                        <h2 class="action-title">📚 化学学习任务</h2>
+                        <div class="action-grid">
+                            <div class="action-card" data-action="note" id="noteBtn">
+                                <div class="action-icon">📝</div>
+                                <div class="action-name">课堂笔记</div>
+                                <div class="action-desc">+3成长值</div>
+                            </div>
+                            <div class="action-card" data-action="practice" id="practiceBtn">
+                                <div class="action-icon">📖</div>
+                                <div class="action-name">巩固练习</div>
+                                <div class="action-desc">+5成长值</div>
+                            </div>
+                            <div class="action-card" data-action="course" id="courseBtn">
+                                <div class="action-icon">✅</div>
+                                <div class="action-name">完成课程</div>
+                                <div class="action-desc">+5成长值</div>
+                            </div>
+                            <div class="action-card" data-action="vocabulary" id="vocabularyBtn">
+                                <div class="action-icon">🔤</div>
+                                <div class="action-name">方程式打卡</div>
+                                <div class="action-desc">+2成长值</div>
+                            </div>
+                            <div class="action-card" data-action="dailyQuestion" id="dailyQuestionBtn">
+                                <div class="action-icon">❓</div>
+                                <div class="action-name">每日一题</div>
+                                <div class="action-desc">+3成长值</div>
+                            </div>
+                            <div class="action-card" data-action="composition" id="compositionBtn">
+                                <div class="action-icon">✍️</div>
+                                <div class="action-name">班级作业</div>
+                                <div class="action-desc">+5成长值</div>
+                            </div>
+                            <div class="action-card" data-action="video" id="videoBtn">
+                                <div class="action-icon">📺</div>
+                                <div class="action-name">接听视频</div>
+                                <div class="action-desc">+5成长值</div>
+                            </div>
+                            <div class="action-card" data-action="dictation" id="dictationBtn">
+                                <div class="action-icon">🎧</div>
+                                <div class="action-name">元素思维导图</div>
+                                <div class="action-desc">+2成长值</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ===== 新增：宠物日报生成 ===== -->
+                    <div class="daily-report-panel">
+                        <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1rem;">📰 生成宠物日报</h3>
+                        <p style="font-size: 0.75rem; color: var(--gray); margin-bottom: 8px;">
+                            自动生成今日宠物状态，复制后发到企微/钉钉群
+                        </p>
+                        <button onclick="generateDailyReport()" class="btn btn-accent" style="width: 100%; font-size: 0.85rem; padding: 10px; margin-bottom: 10px;">
+                            📰 一键生成今日宠物日报
+                        </button>
+                        <textarea id="dailyReportText" class="report-textarea" readonly placeholder="点击上方按钮生成日报..."></textarea>
+                        <div class="report-actions">
+                            <button onclick="copyDailyReport()" class="btn btn-secondary">
+                                📋 复制日报
+                            </button>
+                            <button onclick="shareToWechat()" class="btn btn-primary">
+                                💬 发到企微/钉钉
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="growth-log">
+                        <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1rem;">📝 学习记录</h3>
+                        <div id="growthLog"></div>
+                    </div>
+                    
+                    <div class="data-management">
+                        <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1rem;">💾 数据管理</h3>
+                        <div class="data-buttons">
+                            <button id="exportCSVData" class="btn btn-secondary">导出所有数据(CSV)</button>
+                            <button id="resetData" class="btn btn-danger">重置系统</button>
+                        </div>
+                        <p style="font-size: 0.7rem; color: var(--gray); margin-top: 8px;">
+                            当前学生数: <span id="studentCount">0</span> | 数据最后保存: <span id="lastSave">从未保存</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="batch-panel">
+                <h2 class="panel-title">👥 批量成长操作</h2>
+                
+                <div class="batch-input-group">
+                    <label class="form-label">学生姓名（用逗号或换行分隔，最多100个）</label>
+                    <textarea id="batchOperationNames" class="batch-textarea" placeholder="例如：张三, 李四, 王五&#10;或者：&#10;张三&#10;李四&#10;王五"></textarea>
+                    <div class="batch-hint">一次最多可操作100名学生</div>
+                </div>
+                
+                <div class="batch-input-group">
+                    <label class="form-label">选择成长方式</label>
+                    <select id="batchAction" class="form-select">
+                        <option value="note">📝 课堂笔记 +3成长值</option>
+                        <option value="practice">📖 巩固练习 +5成长值</option>
+                        <option value="course">✅ 完成课程 +5成长值</option>
+                        <option value="vocabulary">🔤 方程式打卡 +2成长值</option>
+                        <option value="dailyQuestion">❓ 每日一题 +3成长值</option>
+                        <option value="composition">✍️ 班级作业 +5成长值</option>
+                        <option value="video">📺 接听视频 +5成长值</option>
+                        <option value="dictation">🎧 元素思维导图 +2成长值</option>
+                    </select>
+                </div>
+                
+                <button id="batchApplyBtn" class="btn btn-primary" style="margin-bottom: 10px;">批量添加成长记录</button>
+                <button id="batchCheckBtn" class="btn btn-secondary">检查学生名单</button>
+                
+                <div id="progressContainer" style="display: none; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
+                        <span id="progressText">处理进度: 0/0</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div id="batchResult" style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.7); border-radius: 8px; font-size: 0.85rem; max-height: 200px; overflow-y: auto; display: none;">
+                    <h4 style="color: var(--primary); margin-bottom: 5px;">操作结果：</h4>
+                    <div id="batchResultContent"></div>
+                </div>
+                
+                <!-- ===== 新增：班级排行榜 ===== -->
+                <div class="ranking-panel">
+                    <h3 class="panel-title">🏅 班级排行榜 TOP10</h3>
+                    <div id="classRanking" style="max-height: 350px; overflow-y: auto;">
+                        <div style="color: var(--gray); text-align: center; padding: 10px; font-size: 0.85rem;">
+                            暂无排行数据
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>学习伴侣 | 好课在线 | 好老师 提升快 | 老师专用版 | 支持最多200名学生 | 成长值=等级 | 6阶段进化系统</p>
+        </div>
+    </div>
+    
+    <!-- CSV导入帮助模态框 -->
+    <div class="modal-overlay" id="csvHelpModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('csvHelpModal').style.display='none'">×</button>
+            <h2 class="modal-header">📁 CSV导入帮助</h2>
+            <div class="help-content">
+                <h4>📄 基本要求</h4>
+                <p>CSV文件必须包含表头，并使用逗号(,)分隔各列。文件可以使用.csv或.txt扩展名。</p>
+                
+                <h4>✅ 必需字段</h4>
+                <p><strong>学生姓名</strong> - 学生的姓名，不能为空</p>
+                
+                <h4>🔤 可选字段（自动识别）</h4>
+                <ul>
+                    <li><strong>班级</strong> - 学生所在班级</li>
+                    <li><strong>伙伴名字</strong> - 学习伙伴的名称</li>
+                    <li><strong>伙伴类型</strong> - 支持中文或英文：
+                        <ul>
+                            <li>🐱 阿伏伽德罗喵 / cat / 猫 / 阿伏伽德罗喵</li>
+                            <li>🐶 氧化汪 / dog / 狗 / 氧化汪</li>
+                            <li>🐲 钠钠龙 / dragon / 龙 / 钠钠龙</li>
+                            <li>🦐 氯氯虾 / shrimp / 虾 / 氯氯虾</li>
+                            <li>🐰 镁镁兔 / rabbit / 兔 / 镁镁兔</li>
+                            <li>🐼 方程式熊猫 / panda / 熊猫 / 方程式熊猫</li>
+                            <li>🦊 镁铝狐 / fox / 狐 / 镁铝狐</li>
+                            <li>🐦 气体啾 / bird / 鸟 / 气体啾</li>
+                        </ul>
+                    </li>
+                    <li><strong>伙伴性别</strong> - 男/♂/male 或 女/♀/female</li>
+                    <li><strong>学习等级 / 总成长值</strong> - 数字，如果不一致会自动处理</li>
+                    <li><strong>进化阶段</strong> - 0-5的数字或中文描述（化学小萌新/微粒小能手/方程式达人/反应小先锋/元素小王者/化学超能大神）</li>
+                    <li><strong>学习活动次数</strong> - 课堂笔记次数、巩固练习次数、完成课程次数、方程式打卡次数、每日一题次数、班级作业次数、接听视频次数、元素思维导图次数（都是数字）</li>
+                </ul>
+                
+                <h4>📊 数据格式示例</h4>
+                <div class="csv-template">
+<code>学生姓名,班级,伙伴名字,伙伴类型,伙伴性别,学习等级,总成长值,进化阶段,课堂笔记次数,巩固练习次数,完成课程次数,方程式打卡次数,每日一题次数,班级作业次数,接听视频次数,元素思维导图次数
+张三,高一(1)班,阿伏伽德罗喵宝宝,阿伏伽德罗喵,男,1,1,0,0,0,0,0,0,0,0,0
+李四,高一(2)班,氧化汪宝贝,氧化汪,女,5,5,0,2,1,0,3,0,1,0,2
+王五,高一(1)班,钠钠龙,钠钠龙,男,12,12,1,6,8,3,7,4,3,2,5</code>
+                </div>
+                
+                <h4>💡 导入规则</h4>
+                <ul>
+                    <li>学生姓名不能重复，重复的会自动跳过并提示</li>
+                    <li>未提供的字段会自动使用默认值或随机值</li>
+                    <li>系统会自动检测和修正格式问题</li>
+                    <li>导入不会删除现有数据，只做新增和更新</li>
+                </ul>
+                
+                <h4>⚠️ 注意事项</h4>
+                <ul>
+                    <li>文件大小不超过1MB</li>
+                    <li>最多支持200名学生</li>
+                    <li>建议使用Excel或文本编辑器创建CSV文件</li>
+                    <li>保存文件时选择"CSV UTF-8"编码</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CSV导入结果模态框 -->
+    <div class="modal-overlay" id="csvResultModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('csvResultModal').style.display='none'">×</button>
+            <h2 class="modal-header">📊 CSV导入结果</h2>
+            <div id="csvResultContent"></div>
+        </div>
+    </div>
+    
+    <input type="file" id="importFile" accept=".csv,.txt" style="display: none;">
+<script>
+    // 宠物类型定义
+    const PET_TYPES = {
+        cat: {
+            name: '阿伏伽德罗喵',
+            emoji: ['🐱', '🐈', '🐅', '🦁', '🐈‍⬛', '😺'],
+            color: ['#FFB347', '#FF8C42', '#FF6B6B', '#FF4757', '#E74C3C', '#C0392B']
+        },
+        dog: {
+            name: '氧化汪',
+            emoji: ['🐶', '🐕', '🦮', '🐺', '🐕‍🦺', '🐕‍⬛'],
+            color: ['#4ECDC4', '#45B7D1', '#2E9CCA', '#1F77B7', '#1A5276', '#154360']
+        },
+        dragon: {
+            name: '钠钠龙',
+            emoji: ['🐲', '🐉', '🐲', '🐉', '🐲', '🐉'],
+            color: ['#96CEB4', '#88D8B0', '#7BCBAE', '#6EC2A8', '#5DAE9E', '#4D9486']
+        },
+        shrimp: {
+            name: '氯氯虾',
+            emoji: ['🦐', '🦐', '🦐', '🦐', '🦐', '🦐'],
+            color: ['#FF9A8B', '#FF7E5F', '#FF6B6B', '#FF5A5A', '#E74C3C', '#C0392B']
+        },
+        rabbit: {
+            name: '镁镁兔',
+            emoji: ['🐰', '🐇', '🐰', '🐇', '🐰', '🐇'],
+            color: ['#DDA0DD', '#DA70D6', '#C71585', '#BA55D3', '#9B59B6', '#8E44AD']
+        },
+        panda: {
+            name: '方程式熊猫',
+            emoji: ['🐼', '🐼', '🐼', '🐼', '🐼', '🐼'],
+            color: ['#A9CCE3', '#7FB3D5', '#5499C7', '#2980B9', '#2471A3', '#1A5276']
+        },
+        fox: {
+            name: '镁铝狐',
+            emoji: ['🦊', '🦊', '🦊', '🦊', '🦊', '🦊'],
+            color: ['#FFB347', '#FF8C42', '#FF6B6B', '#FF4757', '#E74C3C', '#C0392B']
+        },
+        bird: {
+            name: '气体啾',
+            emoji: ['🐦', '🐧', '🦅', '🦅', '🦅', '🦅'],
+            color: ['#ABEBC6', '#82E0AA', '#58D68D', '#2ECC71', '#27AE60', '#1E8449']
+        }
+    }
+
+    // 学习活动定义
+    const STUDY_ACTIVITIES = {
+        note: { 
+            name: '课堂笔记', 
+            exp: 3, 
+            message: '📚 今天的学习笔记记得真好！',
+            emojis: ['📚', '✏️', '📒', '📖', '✨', '💫', '🌟']
+        },
+        practice: { 
+            name: '巩固练习', 
+            exp: 5, 
+            message: '🏆 练习完成得很棒，继续加油！',
+            emojis: ['📈', '🎯', '💪', '🔥', '✨', '🌟', '💫']
+        },
+        course: { 
+            name: '完成课程', 
+            exp: 5, 
+            message: '🎉 恭喜完成课程，又进步了！',
+            emojis: ['🏅', '🎉', '🥳', '🎈', '✨', '💫', '🌟']
+        },
+        vocabulary: { 
+            name: '方程式打卡', 
+            exp: 2, 
+            message: '方程式打卡+2成长值，一步一脚印进步看得见！',
+            emojis: ['🔤', '📅', '✅', '✨', '🌟', '💫', '⭐']
+        },
+        dailyQuestion: { 
+            name: '每日一题', 
+            exp: 3, 
+            message: '🧠 坚持思考，大脑越来越灵活！',
+            emojis: ['❓', '🤔', '💡', '✨', '🌟', '💫', '⭐']
+        },
+        composition: { 
+            name: '班级作业', 
+            exp: 5, 
+            message: '班级作业完成+5成长值，真是老师得好宝宝，学习越来越有感觉了！',
+            emojis: ['📝', '✍️', '📃', '✨', '🌟', '💫', '⭐']
+        },
+        video: { 
+            name: '接听视频', 
+            exp: 5, 
+            message: '📹 今天的外教课很有趣吧！',
+            emojis: ['📹', '🎬', '💻', '✨', '🌟', '💫', '⭐']
+        },
+        dictation: { 
+            name: '元素思维导图', 
+            exp: 2, 
+            message: '元素思维导图完成+2成长值，要想化学好，思路不能少！！有在慢慢进步哦！！',
+            emojis: ['🎧', '👂', '🔊', '🔈', '✨', '🌟', '💫', '⭐']
+        }
+    }
+    
+    // 心情文案池
+    const MOOD_TEXTS = {
+        high: [
+            "状态极佳，学习力爆棚 🚀",
+            "已经进入学习高手模式 💪",
+            "知识浓度超标，小心爆炸 💥"
+        ],
+        mid: [
+            "精神饱满，继续加油 🌟",
+            "稳步成长中，越来越厉害 ✨",
+            "学习状态不错，保持住 💪"
+        ],
+        low: [
+            "刚刚起步，加油哦 💡",
+            "正在努力成长中 🌱",
+            "需要更多学习能量 🔋"
+        ]
+    }
+    
+    class PetSystem {
+        constructor() {
+            this.students = []
+            this.currentStudent = null
+            this.init()
+        }
+        
+        init() {
+            this.loadData()
+            this.setupEventListeners()
+            this.renderPetsList()
+            this.updateStats()
+            this.renderClassRanking()
+        }
+        
+        loadData() {
+            const saved = localStorage.getItem('englishLearningPartnerData')
+            if(saved) {
+                const data = JSON.parse(saved)
+                this.students = data.students || []
+                this.currentStudent = data.currentStudent || null
+                
+                this.migrateData()
+                
+                if(this.currentStudent) {
+                    this.selectStudent(this.currentStudent)
+                }
+                
+                document.getElementById('lastSave').textContent = new Date(data.lastSave || Date.now()).toLocaleString()
+            }
+        }
+        
+        migrateData() {
+            this.students.forEach(student => {
+                if(!student.pet.studyStats) {
+                    student.pet.studyStats = {}
+                }
+                
+                Object.keys(STUDY_ACTIVITIES).forEach(action => {
+                    if(!student.pet.studyStats.hasOwnProperty(action)) {
+                        student.pet.studyStats[action] = 0
+                    }
+                })
+                
+                const fieldMapping = {
+                    'notes': 'note',
+                    'courses': 'course',
+                    'dailyQuestions': 'dailyQuestion',
+                    'compositions': 'composition',
+                    'videos': 'video',
+                    'dictations': 'dictation'
+                }
+                
+                Object.keys(fieldMapping).forEach(oldField => {
+                    if(student.pet.studyStats.hasOwnProperty(oldField)) {
+                        const newField = fieldMapping[oldField]
+                        if(!student.pet.studyStats.hasOwnProperty(newField)) {
+                            student.pet.studyStats[newField] = student.pet.studyStats[oldField]
+                        }
+                        delete student.pet.studyStats[oldField]
+                    }
+                })
+                
+                // 迁移：为旧数据添加 teacherComment 字段
+                if(!student.pet.hasOwnProperty('teacherComment')) {
+                    student.pet.teacherComment = ''
+                }
+            })
+            
+            this.saveData()
+        }
+        
+        saveData() {
+            const data = {
+                students: this.students,
+                currentStudent: this.currentStudent,
+                lastSave: Date.now()
+            }
+            localStorage.setItem('englishLearningPartnerData', JSON.stringify(data))
+            document.getElementById('lastSave').textContent = new Date().toLocaleString()
+        }
+        
+        setupEventListeners() {
+            document.getElementById('addBatchStudentsBtn').addEventListener('click', () => this.addBatchStudents())
+            
+            document.querySelectorAll('.action-card[data-action]').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const action = e.currentTarget.dataset.action
+                    this.performStudyAction(action)
+                })
+            })
+            
+            document.getElementById('exportCSVData').addEventListener('click', () => this.exportCSVData())
+            document.getElementById('downloadTemplate').addEventListener('click', () => this.downloadCSVTemplate())
+            document.getElementById('resetData').addEventListener('click', () => {
+                if(confirm('确定要重置所有数据吗？此操作不可恢复！')) {
+                    localStorage.clear()
+                    location.reload()
+                }
+            })
+            
+            document.getElementById('currentPetName').addEventListener('click', () => this.changePetName())
+            
+            document.getElementById('batchApplyBtn').addEventListener('click', () => this.batchApplyStudyAction())
+            document.getElementById('batchCheckBtn').addEventListener('click', () => this.checkBatchStudents())
+            
+            document.getElementById('changePetBtn').addEventListener('click', () => this.changeCurrentPet())
+            document.getElementById('deletePetBtn').addEventListener('click', () => this.deleteCurrentPet())
+            
+            document.getElementById('searchInput').addEventListener('input', (e) => this.filterPetsList(e.target.value))
+            
+            document.getElementById('importFile').addEventListener('change', (e) => this.importCSVData(e))
+            
+            document.getElementById('csvHelpModal').addEventListener('click', (e) => {
+                if(e.target.id === 'csvHelpModal') {
+                    document.getElementById('csvHelpModal').style.display = 'none'
+                }
+            })
+            
+            document.getElementById('csvResultModal').addEventListener('click', (e) => {
+                if(e.target.id === 'csvResultModal') {
+                    document.getElementById('csvResultModal').style.display = 'none'
+                }
+            })
+        }
+        
+        getRandomPetType() {
+            const types = Object.keys(PET_TYPES)
+            return types[Math.floor(Math.random() * types.length)]
+        }
+        
+        getRandomGender() {
+            return Math.random() > 0.5 ? 'male' : 'female'
+        }
+        
+        addBatchStudents() {
+            const studentNamesInput = document.getElementById('batchStudentNames').value.trim()
+            const className = document.getElementById('studentClass').value.trim()
+            
+            if(!studentNamesInput) {
+                alert('请输入学生姓名')
+                return
+            }
+            
+            if(!className) {
+                alert('请输入班级')
+                return
+            }
+            
+            const studentNames = studentNamesInput.split(/[,，\n]/)
+                .map(name => name.trim())
+                .filter(name => name.length > 0)
+            
+            if(studentNames.length === 0) {
+                alert('请输入有效的学生姓名')
+                return
+            }
+            
+            if(this.students.length + studentNames.length > 200) {
+                alert(`无法添加${studentNames.length}名学生，当前已有${this.students.length}名学生，最多支持200名`)
+                return
+            }
+            
+            let addedCount = 0
+            let existingCount = 0
+            
+            studentNames.forEach(name => {
+                const existingStudent = this.students.find(s => s.name === name && s.class === className)
+                if(existingStudent) {
+                    existingCount++
+                    console.log(`学生 ${name} 已存在，跳过`)
+                    return
+                }
+                
+                const petType = this.getRandomPetType()
+                const gender = this.getRandomGender()
+                
+                const student = {
+                    id: Date.now().toString() + Math.random(),
+                    name: name,
+                    class: className,
+                    pet: {
+                        name: PET_TYPES[petType].name + '宝宝',
+                        type: petType,
+                        gender: gender,
+                        level: 1,
+                        exp: 0,
+                        studyStats: {
+                            note: 0,
+                            practice: 0,
+                            course: 0,
+                            vocabulary: 0,
+                            dailyQuestion: 0,
+                            composition: 0,
+                            video: 0,
+                            dictation: 0
+                        },
+                        growthLog: [],
+                        evolutionStage: 0,
+                        teacherComment: ''
+                    }
+                }
+                
+                this.students.push(student)
+                addedCount++
+            })
+            
+            this.saveData()
+            this.renderPetsList()
+            this.renderClassRanking()
+            
+            let message = ''
+            if(addedCount > 0) {
+                message += `成功添加${addedCount}名学生，已随机分配学习伙伴！`
+            }
+            if(existingCount > 0) {
+                if(message) message += '\n'
+                message += `${existingCount}名学生已存在，未重复添加。`
+            }
+            
+            if(addedCount === 0 && existingCount === 0) {
+                message = '没有添加新学生'
+            }
+            
+            alert(message)
+            
+            document.getElementById('batchStudentNames').value = ''
+            document.getElementById('studentClass').value = ''
+        }
+        
+        selectStudent(studentId) {
+            this.currentStudent = studentId
+            const student = this.students.find(s => s.id === studentId)
+            
+            if(student) {
+                document.getElementById('emptyState').style.display = 'none'
+                document.getElementById('petManagement').style.display = 'block'
+                
+                document.getElementById('changePetType').value = student.pet.type
+                document.getElementById('changePetGender').value = student.pet.gender
+                
+                // 加载教师寄语
+                document.getElementById('teacherComment').value = student.pet.teacherComment || ''
+                
+                this.updatePetDisplay(student)
+                this.saveData()
+            }
+        }
+        
+        updatePetDisplay(student) {
+            const pet = student.pet
+            const petType = PET_TYPES[pet.type]
+            const evolutionStage = this.getEvolutionStage(pet.level)
+            
+            const emoji = petType.emoji[evolutionStage.stage]
+            const color = petType.color[evolutionStage.stage]
+            
+            document.getElementById('petAvatar').textContent = emoji
+            document.getElementById('petAvatar').style.background = `linear-gradient(135deg, ${color}, #FFD166)`
+            document.getElementById('currentPetName').textContent = pet.name
+            document.getElementById('currentPetType').textContent = `${emoji} ${petType.name}`
+            document.getElementById('petLevel').textContent = `Lv.${pet.level}`
+            document.getElementById('petGenderDisplay').textContent = pet.gender === 'male' ? '♂' : '♀'
+            document.getElementById('petGenderDisplay').className = `pet-gender gender-${pet.gender}`
+            
+            document.getElementById('evolutionStage').textContent = evolutionStage.text
+            document.getElementById('evolutionStage').style.color = evolutionStage.color
+            document.getElementById('evolutionStageText').textContent = `${evolutionStage.stage + 1}/6`
+            
+            document.getElementById('expValue').textContent = pet.level
+            document.getElementById('totalExp').textContent = pet.level
+            
+            this.updateStudyStats(pet)
+            this.renderGrowthLog(pet)
+        }
+        
+        updateStudyStats(pet) {
+            const container = document.getElementById('studyStats')
+            container.innerHTML = ''
+            
+            const stats = [
+                { icon: '📝', name: '课堂笔记', count: pet.studyStats.note || 0, key: 'note' },
+                { icon: '📖', name: '巩固练习', count: pet.studyStats.practice || 0, key: 'practice' },
+                { icon: '✅', name: '完成课程', count: pet.studyStats.course || 0, key: 'course' },
+                { icon: '🔤', name: '方程式打卡', count: pet.studyStats.vocabulary || 0, key: 'vocabulary' },
+                { icon: '❓', name: '每日一题', count: pet.studyStats.dailyQuestion || 0, key: 'dailyQuestion' },
+                { icon: '✍️', name: '班级作业', count: pet.studyStats.composition || 0, key: 'composition' },
+                { icon: '📺', name: '接听视频', count: pet.studyStats.video || 0, key: 'video' },
+                { icon: '🎧', name: '元素思维导图', count: pet.studyStats.dictation || 0, key: 'dictation' }
+            ]
+            
+            stats.forEach(stat => {
+                const statEl = document.createElement('div')
+                statEl.className = 'study-stat-item'
+                statEl.innerHTML = `
+                    <div class="study-stat-icon">${stat.icon}</div>
+                    <div class="study-stat-info">
+                        <div class="study-stat-name">${stat.name}</div>
+                    </div>
+                    <div class="study-stat-count">${stat.count}次</div>
+                `
+                container.appendChild(statEl)
+            })
+        }
+        
+        getEvolutionStage(level) {
+            const stages = [
+                { stage: 0, text: '⭐ 化学小萌新', color: '#4A90E2' },
+                { stage: 1, text: '✨ 微粒小能手', color: '#9D4EDD' },
+                { stage: 2, text: '🌟 方程式达人', color: '#FF6B6B' },
+                { stage: 3, text: '🔥 反应小先锋', color: '#FF9F43' },
+                { stage: 4, text: '👑 元素小王者', color: '#2ECC71' },
+                { stage: 5, text: '💎 化学超能大神', color: '#E74C3C' }
+            ]
+            
+            if(level >= 80) return stages[5]
+            if(level >= 50) return stages[4]
+            if(level >= 30) return stages[3]
+            if(level >= 15) return stages[2]
+            if(level >= 5) return stages[1]
+            return stages[0]
+        }
+        
+        getMoodText(level) {
+            if(level >= 50) return MOOD_TEXTS.high[Math.floor(Math.random() * MOOD_TEXTS.high.length)]
+            if(level >= 15) return MOOD_TEXTS.mid[Math.floor(Math.random() * MOOD_TEXTS.mid.length)]
+            return MOOD_TEXTS.low[Math.floor(Math.random() * MOOD_TEXTS.low.length)]
+        }
+        
+        performStudyAction(actionType) {
+            if(!this.currentStudent) {
+                alert('请先选择学习伙伴')
+                return
+            }
+            
+            const student = this.students.find(s => s.id === this.currentStudent)
+            if(!student) return
+            
+            this.addStudyExpToPet(student, actionType)
+        }
+        
+        addStudyExpToPet(student, actionType) {
+            const pet = student.pet
+            const activity = STUDY_ACTIVITIES[actionType]
+            if(!activity) return
+            
+            const oldStage = this.getEvolutionStage(pet.level).stage
+            
+            pet.level += activity.exp
+            pet.studyStats[actionType] = (pet.studyStats[actionType] || 0) + 1
+            
+            const newStage = this.getEvolutionStage(pet.level).stage
+            
+            pet.growthLog.unshift({
+                action: actionType,
+                message: activity.message,
+                timestamp: new Date().toLocaleString()
+            })
+            
+            if(pet.growthLog.length > 8) pet.growthLog = pet.growthLog.slice(0, 8)
+            
+            this.updatePetDisplay(student)
+            this.saveData()
+            this.renderPetsList()
+            this.renderClassRanking()
+        }
+        
+        changeCurrentPet() {
+            if(!this.currentStudent) {
+                alert('请先选择学生')
+                return
+            }
+            
+            const student = this.students.find(s => s.id === this.currentStudent)
+            if(!student) return
+            
+            const petType = document.getElementById('changePetType').value
+            const gender = document.getElementById('changePetGender').value
+            
+            if(!petType || !gender) {
+                alert('请选择宠物类型和性别')
+                return
+            }
+            
+            student.pet.type = petType
+            student.pet.gender = gender
+            student.pet.name = PET_TYPES[petType].name + '宝宝'
+            
+            this.updatePetDisplay(student)
+            this.saveData()
+            this.renderPetsList()
+            alert('学习伙伴更换成功！')
+        }
+        
+        deleteCurrentPet() {
+            if(!this.currentStudent) {
+                alert('请先选择学生')
+                return
+            }
+            
+            const student = this.students.find(s => s.id === this.currentStudent)
+            if(!student) return
+            
+            if(!confirm(`确定要删除学生"${student.name}"及其学习伙伴吗？此操作不可恢复！`)) {
+                return
+            }
+            
+            const studentIndex = this.students.findIndex(s => s.id === this.currentStudent)
+            this.students.splice(studentIndex, 1)
+            
+            this.saveData()
+            this.renderPetsList()
+            this.renderClassRanking()
+            
+            if(this.students.length > 0) {
+                this.currentStudent = this.students[0].id
+                this.selectStudent(this.currentStudent)
+            } else {
+                document.getElementById('emptyState').style.display = 'block'
+                document.getElementById('petManagement').style.display = 'none'
+                this.currentStudent = null
+            }
+            
+            alert(`已删除学生"${student.name}"`)
+        }
+        
+        deletePetById(studentId) {
+            const student = this.students.find(s => s.id === studentId)
+            if(!student) return
+            
+            if(!confirm(`确定要删除学生"${student.name}"及其学习伙伴吗？此操作不可恢复！`)) {
+                return
+            }
+            
+            const studentIndex = this.students.findIndex(s => s.id === studentId)
+            this.students.splice(studentIndex, 1)
+            
+            this.saveData()
+            this.renderPetsList()
+            this.renderClassRanking()
+            
+            if(this.currentStudent === studentId) {
+                if(this.students.length > 0) {
+                    this.currentStudent = this.students[0].id
+                    this.selectStudent(this.currentStudent)
+                } else {
+                    document.getElementById('emptyState').style.display = 'block'
+                    document.getElementById('petManagement').style.display = 'none'
+                    this.currentStudent = null
+                }
+            }
+            
+            alert(`已删除学生"${student.name}"`)
+        }
+        
+        changePetName() {
+            if(!this.currentStudent) return
+            
+            const student = this.students.find(s => s.id === this.currentStudent)
+            if(!student) return
+            
+            const newName = prompt('请输入新的学习伙伴名字：', student.pet.name)
+            if(newName && newName.trim()) {
+                student.pet.name = newName.trim()
+                this.updatePetDisplay(student)
+                this.saveData()
+                this.renderPetsList()
+                alert('学习伙伴名字修改成功！')
+            }
+        }
+        
+        renderPetsList(searchTerm = '') {
+            const gridContainer = document.getElementById('petsGrid')
+            gridContainer.innerHTML = ''
+            
+            let filteredStudents = [...this.students]
+            
+            if(searchTerm) {
+                const term = searchTerm.toLowerCase()
+                filteredStudents = filteredStudents.filter(student => 
+                    student.name.toLowerCase().includes(term) || 
+                    student.class.toLowerCase().includes(term) ||
+                    student.pet.name.toLowerCase().includes(term)
+                )
+            }
+            
+            filteredStudents.sort((a, b) => b.pet.level - a.pet.level)
+            
+            filteredStudents.forEach((student, index) => {
+                const pet = student.pet
+                const petType = PET_TYPES[pet.type]
+                const evolutionStage = this.getEvolutionStage(pet.level)
+                
+                const card = document.createElement('div')
+                card.className = `pet-card ${this.currentStudent === student.id ? 'active' : ''}`
+                card.onclick = (e) => {
+                    if(!e.target.closest('.delete-btn') && !e.target.closest('.link-btn')) {
+                        this.selectStudent(student.id)
+                    }
+                }
+                
+                card.innerHTML = `
+                    <div class="pet-card-avatar" style="background: linear-gradient(135deg, ${petType.color[evolutionStage.stage]}, #FFD166);">
+                        ${petType.emoji[evolutionStage.stage]}
+                    </div>
+                    <div class="pet-card-name">${pet.name}</div>
+                    <div class="pet-card-info">
+                        <span>${pet.gender === 'male' ? '♂' : '♀'}</span>
+                        <span class="pet-card-level">Lv.${pet.level}</span>
+                    </div>
+                    <div class="pet-card-student">${student.name} | ${student.class}</div>
+                    <div class="pet-card-info" style="margin-top: 4px;">
+                        <span style="font-size: 0.7rem; color: ${evolutionStage.color};">${evolutionStage.text.split(' ')[1]}</span>
+                    </div>
+                    <button class="link-btn" data-id="${student.id}" title="生成学生查看链接">🔗</button>
+                    <button class="delete-btn" data-id="${student.id}">×</button>
+                `
+                
+                gridContainer.appendChild(card)
+            })
+            
+            document.getElementById('studentCount').textContent = this.students.length
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation()
+                    const studentId = btn.getAttribute('data-id')
+                    this.deletePetById(studentId)
+                })
+            })
+            
+            document.querySelectorAll('.link-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation()
+                    const studentId = btn.getAttribute('data-id')
+                    this.generateSingleLink(studentId)
+                })
+            })
+            
+            syncStudentSelect(this.students)
+        }
+        
+        generateSingleLink(studentId) {
+            const student = this.students.find(s => s.id === studentId)
+            if(!student) return
+            
+            const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/') + 'student.html'
+            const link = `${baseUrl}?name=${encodeURIComponent(student.name)}&class=${encodeURIComponent(student.class)}`
+            
+            document.getElementById('linkResult').style.display = 'block'
+            document.getElementById('studentLinkText').textContent = link
+            
+            // 同时选中该学生
+            this.selectStudent(studentId)
+        }
+        
+        filterPetsList(searchTerm) {
+            this.renderPetsList(searchTerm)
+        }
+        
+        renderGrowthLog(pet) {
+            const container = document.getElementById('growthLog')
+            container.innerHTML = ''
+            
+            const actionNames = {
+                note: '📝 笔记',
+                practice: '📖 练习',
+                course: '✅ 完课',
+                vocabulary: '🔤 方程式打卡',
+                dailyQuestion: '❓ 每日一题',
+                composition: '✍️ 班级作业',
+                video: '📺 接听视频',
+                dictation: '🎧 元素思维导图'
+            }
+            
+            pet.growthLog.forEach(log => {
+                const div = document.createElement('div')
+                div.className = 'log-item'
+                const actionName = actionNames[log.action] || '✨ 学习'
+                div.innerHTML = `
+                    <div>${actionName}: ${log.message}</div>
+                    <div class="log-time">${log.timestamp}</div>
+                `
+                container.appendChild(div)
+            })
+            
+            if(pet.growthLog.length === 0) {
+                container.innerHTML = '<div style="color: var(--gray); text-align: center; padding: 10px; font-size: 0.8rem;">暂无学习记录</div>'
+            }
+        }
+        
+        batchApplyStudyAction() {
+            const studentNamesInput = document.getElementById('batchOperationNames').value.trim()
+            const actionType = document.getElementById('batchAction').value
+            
+            if(!studentNamesInput) {
+                alert('请输入学生姓名')
+                return
+            }
+            
+            const studentNames = studentNamesInput.split(/[,，\n]/)
+                .map(name => name.trim())
+                .filter(name => name.length > 0)
+            
+            if(studentNames.length === 0) {
+                alert('请输入有效的学生姓名')
+                return
+            }
+            
+            if(studentNames.length > 100) {
+                alert('一次最多操作100名学生')
+                return
+            }
+            
+            const activity = STUDY_ACTIVITIES[actionType]
+            if(!activity) {
+                alert('无效的成长方式')
+                return
+            }
+            
+            const progressContainer = document.getElementById('progressContainer')
+            const progressText = document.getElementById('progressText')
+            const progressPercent = document.getElementById('progressPercent')
+            const progressFill = document.getElementById('progressFill')
+            const batchResult = document.getElementById('batchResult')
+            const batchResultContent = document.getElementById('batchResultContent')
+            
+            progressContainer.style.display = 'block'
+            batchResult.style.display = 'none'
+            
+            const results = []
+            let successCount = 0
+            let processedCount = 0
+            const totalCount = studentNames.length
+            
+            const processNextStudent = () => {
+                if(processedCount >= totalCount) {
+                    progressFill.style.width = '100%'
+                    progressText.textContent = `处理完成: ${successCount}/${totalCount}`
+                    progressPercent.textContent = '100%'
+                    
+                    this.showBatchResult(results, successCount, totalCount, activity.name, activity.exp)
+                    this.renderPetsList()
+                    this.renderClassRanking()
+                    alert(`批量操作完成！成功为${successCount}名学生添加${activity.name}`)
+                    return
+                }
+                
+                const studentName = studentNames[processedCount]
+                const student = this.students.find(s => s.name === studentName)
+                
+                if(student) {
+                    this.addStudyExpToPet(student, actionType)
+                    successCount++
+                    results.push(`✅ ${studentName}: 成功添加${activity.exp}成长值`)
+                } else {
+                    results.push(`❌ ${studentName}: 未找到该学生`)
+                }
+                
+                processedCount++
+                
+                const progress = Math.floor((processedCount / totalCount) * 100)
+                progressFill.style.width = `${progress}%`
+                progressText.textContent = `处理进度: ${processedCount}/${totalCount}`
+                progressPercent.textContent = `${progress}%`
+                
+                setTimeout(processNextStudent, 10)
+            }
+            
+            processNextStudent()
+        }
+        
+        checkBatchStudents() {
+            const studentNamesInput = document.getElementById('batchOperationNames').value.trim()
+            
+            if(!studentNamesInput) {
+                alert('请输入学生姓名')
+                return
+            }
+            
+            const studentNames = studentNamesInput.split(/[,，\n]/)
+                .map(name => name.trim())
+                .filter(name => name.length > 0)
+            
+            if(studentNames.length === 0) {
+                alert('请输入有效的学生姓名')
+                return
+            }
+            
+            const results = []
+            let foundCount = 0
+            
+            studentNames.forEach(studentName => {
+                const student = this.students.find(s => s.name === studentName)
+                if(student) {
+                    foundCount++
+                    results.push(`✅ ${studentName}: 找到 (${student.class} - ${student.pet.name} Lv.${student.pet.level})`)
+                } else {
+                    results.push(`❌ ${studentName}: 未找到`)
+                }
+            })
+            
+            this.showBatchResult(results, foundCount, studentNames.length, '检查结果', 0)
+        }
+        
+        showBatchResult(results, successCount, totalCount, actionName, expAdded) {
+            const container = document.getElementById('batchResult')
+            const content = document.getElementById('batchResultContent')
+            
+            let html = `<div style="margin-bottom: 10px; color: ${successCount === totalCount ? 'green' : successCount > 0 ? 'orange' : 'red'}; font-weight: bold;">`
+                html += `${successCount}/${totalCount} 名学生操作成功`
+            html += `</div>`
+            
+            if(expAdded > 0) {
+                html += `<div style="margin-bottom: 10px; color: var(--primary);">`
+                html += `已为${successCount}名学生添加${actionName} +${expAdded}成长值`
+                html += `</div>`
+            }
+            
+            results.forEach(result => {
+                html += `<div style="padding: 4px 0; border-bottom: 1px solid #eee; font-size: 0.8rem;">${result}</div>`
+            })
+            
+            content.innerHTML = html
+            container.style.display = 'block'
+            
+            document.getElementById('batchOperationNames').value = ''
+        }
+        
+        updateStats() {
+            if(this.students.length > 0) {
+                const totalLevel = this.students.reduce((sum, student) => sum + student.pet.level, 0)
+                const avgLevel = Math.round(totalLevel / this.students.length)
+            }
+        }
+        
+        exportCSVData() {
+            if(this.students.length === 0) {
+                alert('没有数据可导出')
+                return
+            }
+            
+            const csvData = []
+            const headers = ['学生姓名', '班级', '伙伴名字', '伙伴类型', '伙伴性别', '学习等级', '总成长值', '进化阶段', '课堂笔记次数', '巩固练习次数', '完成课程次数', '方程式打卡次数', '每日一题次数', '班级作业次数', '接听视频次数', '元素思维导图次数', '教师寄语']
+            
+            csvData.push(headers.join(','))
+            
+            this.students.forEach((student) => {
+                const pet = student.pet
+                const evolutionStage = this.getEvolutionStage(pet.level)
+                
+                const row = [
+                    student.name,
+                    student.class,
+                    pet.name,
+                    PET_TYPES[pet.type].name,
+                    pet.gender === 'male' ? '男' : '女',
+                    pet.level,
+                    pet.level,
+                    evolutionStage.text,
+                    pet.studyStats.note || 0,
+                    pet.studyStats.practice || 0,
+                    pet.studyStats.course || 0,
+                    pet.studyStats.vocabulary || 0,
+                    pet.studyStats.dailyQuestion || 0,
+                    pet.studyStats.composition || 0,
+                    pet.studyStats.video || 0,
+                    pet.studyStats.dictation || 0,
+                    pet.teacherComment || ''
+                ].map(field => `"${field}"`).join(',')
+                
+                csvData.push(row)
+            })
+            
+            const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + csvData.join('\n')
+            const encodedUri = encodeURI(csvContent)
+            const link = document.createElement('a')
+            link.setAttribute('href', encodedUri)
+            link.setAttribute('download', `学习伙伴系统_导出_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`)
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            
+            alert(`CSV数据已导出，共${this.students.length}条记录`)
+        }
+        
+        downloadCSVTemplate() {
+            const csvData = []
+            const headers = ['学生姓名', '班级', '伙伴名字', '伙伴类型', '伙伴性别', '学习等级', '总成长值', '进化阶段', '课堂笔记次数', '巩固练习次数', '完成课程次数', '方程式打卡次数', '每日一题次数', '班级作业次数', '接听视频次数', '元素思维导图次数']
+            
+            csvData.push(headers.join(','))
+            csvData.push('张三,高一(1)班,阿伏伽德罗喵宝宝,阿伏伽德罗喵,男,1,1,0,0,0,0,0,0,0,0,0')
+            csvData.push('李四,高一(2)班,氧化汪宝贝,氧化汪,女,5,5,0,2,1,0,3,0,1,0,2')
+            csvData.push('王五,高一(1)班,钠钠龙宝贝,钠钠龙,男,12,12,1,6,8,3,7,4,3,2,5')
+            csvData.push('# 注意：1. 学生姓名为必填字段，其他字段可选')
+            csvData.push('# 2. 班级：可以是任意字符串')
+            csvData.push('# 3. 伙伴名字：如果不填，将自动生成')
+            csvData.push('# 4. 伙伴类型：支持中文（阿伏伽德罗喵/氧化汪/钠钠龙/氯氯虾/镁镁兔/方程式熊猫/镁铝狐/气体啾）或英文（cat/dog/dragon/shrimp/rabbit/panda/fox/bird）')
+            csvData.push('# 5. 伙伴性别：支持中文（男/女）或英文（male/female）或符号（♂/♀）')
+            csvData.push('# 6. 学习等级/总成长值：如果不填，默认为1')
+            csvData.push('# 7. 进化阶段：支持数字0-5或中文（化学小萌新/微粒小能手/方程式达人/反应小先锋/元素小王者/化学超能大神）')
+            csvData.push('# 8. 学习活动次数：都是数字，如果不填默认为0')
+            
+            const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + csvData.join('\n')
+            const encodedUri = encodeURI(csvContent)
+            const link = document.createElement('a')
+            link.setAttribute('href', encodedUri)
+            link.setAttribute('download', '学习伙伴系统_CSV导入模板.csv')
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            
+            alert('CSV模板已下载，请使用Excel或文本编辑器打开查看')
+        }
+        
+        importCSVData(event) {
+            const file = event.target.files[0]
+            if(!file) return
+            
+            const fileName = file.name.toLowerCase()
+            if(!fileName.endsWith('.csv') && !fileName.endsWith('.txt')) {
+                alert('请选择CSV格式的文件（.csv 或 .txt）')
+                event.target.value = ''
+                return
+            }
+            
+            if(file.size > 1024 * 1024) {
+                alert('文件大小不能超过1MB')
+                event.target.value = ''
+                return
+            }
+            
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                try {
+                    this.parseCSVData(e.target.result)
+                } catch(error) {
+                    console.error('CSV解析错误:', error)
+                    alert('CSV文件解析失败，请检查文件格式是否正确')
+                }
+            }
+            
+            reader.onerror = () => {
+                alert('读取文件失败，请重试')
+                event.target.value = ''
+            }
+            
+            reader.readAsText(file, 'UTF-8')
+        }
+        
+        parseCSVData(csvText) {
+            if(!csvText || csvText.trim() === '') {
+                alert('CSV文件为空')
+                return
+            }
+            
+            const results = []
+            const errors = []
+            const warnings = []
+            
+            const lines = csvText.split(/\r\n|\n|\r/)
+            if(lines.length < 2) {
+                alert('CSV文件内容不完整，至少需要表头行和数据行')
+                return
+            }
+            
+            const headerLine = lines[0]
+            const headers = this.parseCSVLine(headerLine)
+            
+            if(headers.length === 0) {
+                alert('无法解析CSV表头')
+                return
+            }
+            
+            const studentNameIndex = headers.findIndex(h => this.normalizeFieldName(h) === '学生姓名')
+            if(studentNameIndex === -1) {
+                alert('CSV文件中必须包含"学生姓名"列')
+                return
+            }
+            
+            const fieldMapping = this.createFieldMapping(headers)
+            
+            for(let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim()
+                if(line === '' || line.startsWith('#')) continue
+                
+                try {
+                    const columns = this.parseCSVLine(line)
+                    if(columns.length === 0) continue
+                    
+                    const studentData = this.parseStudentRow(columns, fieldMapping, i)
+                    
+                    if(this.validateStudentData(studentData, i, errors)) {
+                        results.push(studentData)
+                    }
+                } catch(error) {
+                    errors.push(`第${i+1}行: 格式错误 - ${error.message}`)
+                }
+            }
+            
+            if(results.length === 0 && errors.length === 0) {
+                alert('没有找到有效的学生数据')
+                return
+            }
+            
+            this.processImportResults(results, errors, warnings)
+        }
+        
+        parseCSVLine(line) {
+            const result = []
+            let inQuotes = false
+            let current = ''
+            
+            for(let i = 0; i < line.length; i++) {
+                const char = line[i]
+                if(char === '"') {
+                    inQuotes = !inQuotes
+                } else if(char === ',' && !inQuotes) {
+                    result.push(current.trim())
+                    current = ''
+                } else {
+                    current += char
+                }
+            }
+            
+            result.push(current.trim())
+            return result
+        }
+        
+        normalizeFieldName(field) {
+            const fieldMap = {
+                '学生姓名': '学生姓名',
+                '姓名': '学生姓名',
+                'name': '学生姓名',
+                'student': '学生姓名',
+                'student name': '学生姓名',
+                '班级': '班级',
+                'class': '班级',
+                '班级名': '班级',
+                '伙伴名字': '伙伴名字',
+                '宠物名字': '伙伴名字',
+                'pet name': '伙伴名字',
+                '宠物名': '伙伴名字',
+                '伙伴类型': '伙伴类型',
+                '宠物类型': '伙伴类型',
+                '宠物种类': '伙伴类型',
+                'pet type': '伙伴类型',
+                'pet': '伙伴类型',
+                '伙伴性别': '伙伴性别',
+                '宠物性别': '伙伴性别',
+                'gender': '伙伴性别',
+                'sex': '伙伴性别',
+                '学习等级': '学习等级',
+                '等级': '学习等级',
+                'level': '学习等级',
+                '总成长值': '总成长值',
+                '成长值': '总成长值',
+                'exp': '总成长值',
+                'experience': '总成长值',
+                '进化阶段': '进化阶段',
+                '阶段': '进化阶段',
+                'evolution': '进化阶段',
+                'stage': '进化阶段',
+                '课堂笔记次数': '课堂笔记次数',
+                '笔记次数': '课堂笔记次数',
+                'note': '课堂笔记次数',
+                '巩固练习次数': '巩固练习次数',
+                '练习次数': '巩固练习次数',
+                'practice': '巩固练习次数',
+                '完成课程次数': '完成课程次数',
+                '课程次数': '完成课程次数',
+                'course': '完成课程次数',
+                '方程式打卡次数': '方程式打卡次数',
+                '单词打卡次数': '方程式打卡次数',
+                '单词次数': '方程式打卡次数',
+                'vocabulary': '方程式打卡次数',
+                '每日一题次数': '每日一题次数',
+                '每日一题': '每日一题次数',
+                'dailyQuestion': '每日一题次数',
+                'daily question': '每日一题次数',
+                '班级作业次数': '班级作业次数',
+                '化学作文次数': '班级作业次数',
+                '作文次数': '班级作业次数',
+                'composition': '班级作业次数',
+                '接听视频次数': '接听视频次数',
+                '视频次数': '接听视频次数',
+                'video': '接听视频次数',
+                '元素思维导图次数': '元素思维导图次数',
+                '单词听写次数': '元素思维导图次数',
+                '听写次数': '元素思维导图次数',
+                'dictation': '元素思维导图次数',
+                '教师寄语': '教师寄语',
+                '寄语': '教师寄语',
+                'teacher comment': '教师寄语',
+                'comment': '教师寄语'
+            }
+            
+            const normalized = field.trim().toLowerCase()
+            for(const [key, value] of Object.entries(fieldMap)) {
+                if(key.toLowerCase() === normalized || 
+                   field.includes(key) || 
+                   key.includes(normalized)) {
+                    return value
+                }
+            }
+            
+            return field
+        }
+        
+        createFieldMapping(headers) {
+            const mapping = {}
+            
+            headers.forEach((header, index) => {
+                const normalized = this.normalizeFieldName(header)
+                mapping[normalized] = index
+            })
+            
+            return mapping
+        }
+        
+        parseStudentRow(columns, fieldMapping, rowIndex) {
+            const student = {
+                id: Date.now().toString() + Math.random(),
+                name: '',
+                class: '',
+                pet: {
+                    name: '',
+                    type: '',
+                    gender: '',
+                    level: 1,
+                    exp: 0,
+                    studyStats: {
+                        note: 0,
+                        practice: 0,
+                        course: 0,
+                        vocabulary: 0,
+                        dailyQuestion: 0,
+                        composition: 0,
+                        video: 0,
+                        dictation: 0
+                    },
+                    growthLog: [],
+                    evolutionStage: 0,
+                    teacherComment: ''
+                }
+            }
+            
+            if(fieldMapping['学生姓名'] !== undefined && columns[fieldMapping['学生姓名']]) {
+                student.name = columns[fieldMapping['学生姓名']].trim()
+            }
+            
+            if(fieldMapping['班级'] !== undefined && columns[fieldMapping['班级']]) {
+                student.class = columns[fieldMapping['班级']].trim()
+            } else {
+                student.class = '未分配班级'
+            }
+            
+            if(fieldMapping['伙伴名字'] !== undefined && columns[fieldMapping['伙伴名字']]) {
+                student.pet.name = columns[fieldMapping['伙伴名字']].trim()
+            }
+            
+            if(fieldMapping['伙伴类型'] !== undefined && columns[fieldMapping['伙伴类型']]) {
+                const petType = this.normalizePetType(columns[fieldMapping['伙伴类型']])
+                if(petType) {
+                    student.pet.type = petType
+                }
+            }
+            
+            if(fieldMapping['伙伴性别'] !== undefined && columns[fieldMapping['伙伴性别']]) {
+                const gender = this.normalizeGender(columns[fieldMapping['伙伴性别']])
+                if(gender) {
+                    student.pet.gender = gender
+                }
+            }
+            
+            if(fieldMapping['学习等级'] !== undefined && columns[fieldMapping['学习等级']]) {
+                const level = parseInt(columns[fieldMapping['学习等级']])
+                if(!isNaN(level) && level > 0) {
+                    student.pet.level = level
+                }
+            }
+            
+            if(fieldMapping['总成长值'] !== undefined && columns[fieldMapping['总成长值']]) {
+                const exp = parseInt(columns[fieldMapping['总成长值']])
+                if(!isNaN(exp) && exp > 0) {
+                    student.pet.level = Math.max(student.pet.level, exp)
+                }
+            }
+            
+            if(fieldMapping['进化阶段'] !== undefined && columns[fieldMapping['进化阶段']]) {
+                const stage = this.parseEvolutionStage(columns[fieldMapping['进化阶段']])
+                if(stage !== null) {
+                    student.pet.evolutionStage = stage
+                }
+            }
+            
+            const studyStats = ['课堂笔记次数', '巩固练习次数', '完成课程次数', '方程式打卡次数', 
+                               '每日一题次数', '班级作业次数', '接听视频次数', '元素思维导图次数']
+            
+            studyStats.forEach(stat => {
+                if(fieldMapping[stat] !== undefined && columns[fieldMapping[stat]]) {
+                    const value = parseInt(columns[fieldMapping[stat]])
+                    if(!isNaN(value) && value >= 0) {
+                        const statKey = this.getStatKey(stat)
+                        student.pet.studyStats[statKey] = value
+                    }
+                }
+            })
+            
+            if(fieldMapping['教师寄语'] !== undefined && columns[fieldMapping['教师寄语']]) {
+                student.pet.teacherComment = columns[fieldMapping['教师寄语']].trim()
+            }
+            
+            if(!student.pet.name) {
+                const petType = student.pet.type || this.getRandomPetType()
+                student.pet.name = PET_TYPES[petType].name + '宝宝'
+            }
+            
+            if(!student.pet.type) {
+                student.pet.type = this.getRandomPetType()
+            }
+            
+            if(!student.pet.gender) {
+                student.pet.gender = this.getRandomGender()
+            }
+            
+            return student
+        }
+        
+        normalizePetType(petType) {
+            if(!petType) return null
+            
+            const type = petType.trim().toLowerCase()
+            const typeMap = {
+                'cat': 'cat',
+                '猫': 'cat',
+                '阿伏伽德罗喵': 'cat',
+                'dog': 'dog',
+                '狗': 'dog',
+                '氧化汪': 'dog',
+                'dragon': 'dragon',
+                '龙': 'dragon',
+                '钠钠龙': 'dragon',
+                'shrimp': 'shrimp',
+                '虾': 'shrimp',
+                '氯氯虾': 'shrimp',
+                'rabbit': 'rabbit',
+                '兔': 'rabbit',
+                '镁镁兔': 'rabbit',
+                'panda': 'panda',
+                '熊猫': 'panda',
+                '方程式熊猫': 'panda',
+                'fox': 'fox',
+                '狐': 'fox',
+                '镁铝狐': 'fox',
+                'bird': 'bird',
+                '鸟': 'bird',
+                '气体啾': 'bird'
+            }
+            
+            for(const [key, value] of Object.entries(typeMap)) {
+                if(type.includes(key) || key.includes(type)) {
+                    return value
+                }
+            }
+            
+            return null
+        }
+        
+        normalizeGender(gender) {
+            if(!gender) return null
+            
+            const g = gender.trim().toLowerCase()
+            if(g === '男' || g === 'male' || g === '♂') {
+                return 'male'
+            } else if(g === '女' || g === 'female' || g === '♀') {
+                return 'female'
+            }
+            
+            return null
+        }
+        
+        parseEvolutionStage(stage) {
+            if(!stage) return null
+            
+            const s = stage.toString().trim()
+            
+            if(!isNaN(s)) {
+                const num = parseInt(s)
+                if(num >= 0 && num <= 5) {
+                    return num
+                }
+            }
+            
+            const stageMap = {
+                '化学小萌新': 0,
+                '小萌新': 0,
+                '萌新': 0,
+                '微粒小能手': 1,
+                '小能手': 1,
+                '方程式达人': 2,
+                '达人': 2,
+                '反应小先锋': 3,
+                '小先锋': 3,
+                '元素小王者': 4,
+                '小王者': 4,
+                '化学超能大神': 5,
+                '超能大神': 5
+            }
+            
+            for(const [key, value] of Object.entries(stageMap)) {
+                if(s.includes(key) || key.includes(s)) {
+                    return value
+                }
+            }
+            
+            return null
+        }
+        
+        getStatKey(statName) {
+            const statMap = {
+                '课堂笔记次数': 'note',
+                '巩固练习次数': 'practice',
+                '完成课程次数': 'course',
+                '方程式打卡次数': 'vocabulary',
+                '每日一题次数': 'dailyQuestion',
+                '班级作业次数': 'composition',
+                '接听视频次数': 'video',
+                '元素思维导图次数': 'dictation'
+            }
+            
+            return statMap[statName] || statName
+        }
+        
+        validateStudentData(studentData, rowIndex, errors) {
+            if(!studentData.name || studentData.name.trim() === '') {
+                errors.push(`第${rowIndex+1}行: 学生姓名不能为空`)
+                return false
+            }
+            
+            if(studentData.pet.level < 1 || studentData.pet.level > 100) {
+                errors.push(`第${rowIndex+1}行: 学习等级必须在1-100之间`)
+                studentData.pet.level = 1
+            }
+            
+            Object.keys(studentData.pet.studyStats).forEach(stat => {
+                if(studentData.pet.studyStats[stat] < 0) {
+                    errors.push(`第${rowIndex+1}行: ${stat}不能为负数`)
+                    studentData.pet.studyStats[stat] = 0
+                }
+            })
+            
+            return true
+        }
+        
+        processImportResults(results, errors, warnings) {
+            let addedCount = 0
+            let updatedCount = 0
+            let skippedCount = 0
+            
+            const detailedResults = []
+            
+            results.forEach(studentData => {
+                const existingIndex = this.students.findIndex(s => 
+                    s.name === studentData.name && s.class === studentData.class
+                )
+                
+                if(existingIndex !== -1) {
+                    const existingStudent = this.students[existingIndex]
+                    
+                    if(!this.confirmOverwrite(studentData.name, studentData.class)) {
+                        skippedCount++
+                        detailedResults.push(`⚠️ ${studentData.name} (${studentData.class}): 已存在，跳过`)
+                        return
+                    }
+                    
+                    this.students[existingIndex] = studentData
+                    updatedCount++
+                    detailedResults.push(`🔄 ${studentData.name} (${studentData.class}): 已更新数据`)
+                } else {
+                    if(this.students.length >= 200) {
+                        warnings.push(`已达到200名学生上限，无法添加更多学生`)
+                        return
+                    }
+                    
+                    this.students.push(studentData)
+                    addedCount++
+                    detailedResults.push(`✅ ${studentData.name} (${studentData.class}): 添加成功`)
+                }
+            })
+            
+            this.saveData()
+            this.renderPetsList()
+            this.renderClassRanking()
+            
+            this.showCSVImportResults(addedCount, updatedCount, skippedCount, results.length, errors, warnings, detailedResults)
+        }
+        
+        confirmOverwrite(name, className) {
+            return confirm(`学生 ${name} (${className}) 已存在，是否覆盖现有数据？\n点击"确定"覆盖，点击"取消"跳过。`)
+        }
+        
+        showCSVImportResults(added, updated, skipped, total, errors, warnings, details) {
+            const modal = document.getElementById('csvResultModal')
+            const content = document.getElementById('csvResultContent')
+            
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #2ECC71; margin-bottom: 10px;">
+                        ✅ CSV导入完成！
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="margin-bottom: 8px;">📊 导入统计：</div>
+                        <div style="margin-left: 20px; line-height: 1.8;">
+                            <div>📁 总行数: ${total}</div>
+                            <div>✅ 新增学生: ${added}</div>
+                            <div>🔄 更新学生: ${updated}</div>
+                            <div>⚠️ 跳过学生: ${skipped}</div>
+                            <div>❌ 错误行数: ${errors.length}</div>
+                        </div>
+                    </div>
+            `
+            
+            if(errors.length > 0) {
+                html += `
+                    <div style="color: #FF4757; font-weight: bold; margin-bottom: 8px;">
+                        ❌ 错误列表：
+                    </div>
+                    <div style="background: rgba(255, 71, 87, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; max-height: 150px; overflow-y: auto;">
+                        ${errors.map(error => `<div style="margin-bottom: 4px;">${error}</div>`).join('')}
+                    </div>
+                `
+            }
+            
+            if(warnings.length > 0) {
+                html += `
+                    <div style="color: #FFA502; font-weight: bold; margin-bottom: 8px;">
+                        ⚠️ 警告信息：
+                    </div>
+                    <div style="background: rgba(255, 165, 2, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; max-height: 150px; overflow-y: auto;">
+                        ${warnings.map(warning => `<div style="margin-bottom: 4px;">${warning}</div>`).join('')}
+                    </div>
+                `
+            }
+            
+            if(details.length > 0) {
+                html += `
+                    <div style="color: #4A90E2; font-weight: bold; margin-bottom: 8px;">
+                        📋 详细信息：
+                    </div>
+                    <div style="background: rgba(74, 144, 226, 0.1); padding: 10px; border-radius: 6px; font-size: 0.9rem; max-height: 300px; overflow-y: auto; line-height: 1.6;">
+                        ${details.map(detail => `<div style="margin-bottom: 4px;">${detail}</div>`).join('')}
+                    </div>
+                `
+            }
+            
+            html += `
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee; font-size: 0.9rem; color: #666;">
+                    💡 提示：导入已完成，请点击下方关闭按钮，或点击背景关闭此窗口。
+                </div>
+            `
+            
+            content.innerHTML = html
+            modal.style.display = 'flex'
+        }
+        
+        renderClassRanking() {
+            const container = document.getElementById('classRanking')
+            if(!container) return
+            
+            if(this.students.length === 0) {
+                container.innerHTML = '<div style="color: var(--gray); text-align: center; padding: 10px; font-size: 0.85rem;">暂无排行数据</div>'
+                return
+            }
+            
+            const sorted = [...this.students].sort((a, b) => b.pet.level - a.pet.level).slice(0, 10)
+            
+            container.innerHTML = ''
+            sorted.forEach((student, index) => {
+                const pet = student.pet
+                const petType = PET_TYPES[pet.type]
+                const stage = this.getEvolutionStage(pet.level)
+                
+                const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`
+                
+                const item = document.createElement('div')
+                item.className = 'ranking-item'
+                item.innerHTML = `
+                    <div class="ranking-rank">${rankEmoji}</div>
+                    <div class="ranking-emoji">${petType.emoji[stage.stage]}</div>
+                    <div class="ranking-info">
+                        <div class="ranking-name">${student.name}</div>
+                        <div style="font-size: 0.75rem; color: var(--gray);">${student.class}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="ranking-level">Lv.${pet.level}</div>
+                        <div style="font-size: 0.7rem; color: ${stage.color};">${stage.text.split(' ')[1]}</div>
+                    </div>
+                `
+                container.appendChild(item)
+            })
+        }
+        
+        generateDailyReportForStudent(student) {
+            const pet = student.pet
+            const petType = PET_TYPES[pet.type]
+            const stage = this.getEvolutionStage(pet.level)
+            const mood = this.getMoodText(pet.level)
+            
+            // 计算总学习次数
+            let totalStudy = 0
+            Object.values(pet.studyStats).forEach(v => totalStudy += (v || 0))
+            
+            // 最近学习记录
+            let recentLogs = ''
+            if(pet.growthLog && pet.growthLog.length > 0) {
+                const actionNames = {
+                    note: '📝笔记',
+                    practice: '📖练习',
+                    course: '✅完课',
+                    vocabulary: '🔤方程式打卡',
+                    dailyQuestion: '❓每日一题',
+                    composition: '✍️班级作业',
+                    video: '📺接听视频',
+                    dictation: '🎧思维导图'
+                }
+                pet.growthLog.slice(0, 3).forEach(log => {
+                    const an = actionNames[log.action] || '✨学习'
+                    recentLogs += `${an}：${log.message}\n`
+                })
+            } else {
+                recentLogs = '暂无学习记录\n'
+            }
+            
+            const comment = pet.teacherComment ? `\n💬 老师对你说：${pet.teacherComment}\n` : ''
+            
+            return `📖 ${pet.name} 的宠物日报
+━━━━━━━━━━━━━━━━
+${petType.emoji[stage.stage]} ${pet.name} | ${petType.name}
+Lv.${pet.level} · ${stage.text}
+📊 累计学习 ${totalStudy} 次
+
+💭 当前状态：${mood}
+${comment}
+📝 最近成长记录：
+${recentLogs}
+━━━━━━━━━━━━━━━━
+${petType.emoji[stage.stage]} 学习伴侣 · 好课在线 · 好老师 提升快`
+        }
+    }
+    
+    const petSystem = new PetSystem()
+    
+    // ============ 全局函数（教师端新增功能）============
+    
+    function generateStudentLink() {
+        const select = document.getElementById('linkStudentSelect')
+        const studentId = select.value
+        if(!studentId) { alert('请先选择学生'); return }
+        petSystem.generateSingleLink(studentId)
+    }
+    
+    function copyStudentLink() {
+        const text = document.getElementById('studentLinkText').textContent
+        if(navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => alert('✅ 链接已复制，可以发到企微/钉钉'))
+        } else {
+            const ta = document.createElement('textarea')
+            ta.value = text
+            document.body.appendChild(ta)
+            ta.select()
+            document.execCommand('copy')
+            document.body.removeChild(ta)
+            alert('✅ 链接已复制')
+        }
+    }
+    
+    function generateAllLinks() {
+        if(petSystem.students.length === 0) {
+            alert('没有学生数据')
+            return
+        }
+        
+        const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/') + 'student.html'
+        let links = '📋 学生专属查看链接（复制发到企微/钉钉）\n'
+        links += '━━━━━━━━━━━━━━━━\n\n'
+        
+        petSystem.students.forEach(student => {
+            const link = `${baseUrl}?name=${encodeURIComponent(student.name)}&class=${encodeURIComponent(student.class)}`
+            links += `${student.name}（${student.class}）\n${link}\n\n`
+        })
+        
+        document.getElementById('linkResultAll').style.display = 'block'
+        document.getElementById('allLinksText').value = links
+    }
+    
+    function copyAllLinks() {
+        const text = document.getElementById('allLinksText').value
+        if(navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => alert('✅ 全部链接已复制！'))
+        } else {
+            const ta = document.createElement('textarea')
+            ta.value = text
+            document.body.appendChild(ta)
+            ta.select()
+            document.execCommand('copy')
+            document.body.removeChild(ta)
+            alert('✅ 全部链接已复制！')
+        }
+    }
+    
+    function saveTeacherComment() {
+        if(!petSystem.currentStudent) {
+            alert('请先选择学生')
+            return
+        }
+        
+        const student = petSystem.students.find(s => s.id === petSystem.currentStudent)
+        if(!student) return
+        
+        student.pet.teacherComment = document.getElementById('teacherComment').value.trim()
+        petSystem.saveData()
+        alert('✅ 寄语已保存，学生端将同步显示')
+    }
+    
+    function generateDailyReport() {
+        if(!petSystem.currentStudent) {
+            alert('请先选择学生')
+            return
+        }
+        
+        const student = petSystem.students.find(s => s.id === petSystem.currentStudent)
+        if(!student) return
+        
+        const report = petSystem.generateDailyReportForStudent(student)
+        document.getElementById('dailyReportText').value = report
+    }
+    
+    function copyDailyReport() {
+        const text = document.getElementById('dailyReportText').value
+        if(!text) {
+            alert('请先生成日报')
+            return
+        }
+        if(navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => alert('✅ 日报已复制，可以发到群里了！'))
+        } else {
+            const ta = document.createElement('textarea')
+            ta.value = text
+            document.body.appendChild(ta)
+            ta.select()
+            document.execCommand('copy')
+            document.body.removeChild(ta)
+            alert('✅ 日报已复制！')
+        }
+    }
+    
+    function shareToWechat() {
+        const text = document.getElementById('dailyReportText').value
+        if(!text) {
+            alert('请先生成日报')
+            return
+        }
+        // 复制到剪贴板，提示用户去企微/钉钉粘贴
+        if(navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ 日报已复制！\n\n请打开企微/钉钉 → 选择群聊 → 粘贴发送')
+            })
+        } else {
+            const ta = document.createElement('textarea')
+            ta.value = text
+            document.body.appendChild(ta)
+            ta.select()
+            document.execCommand('copy')
+            document.body.removeChild(ta)
+            alert('✅ 日报已复制！\n\n请打开企微/钉钉 → 选择群聊 → 粘贴发送')
+        }
+    }
+    
+    function syncStudentSelect(students) {
+        const select = document.getElementById('linkStudentSelect')
+        if(!select) return
+        const prev = select.value
+        select.innerHTML = '<option value="">-- 选择学生 --</option>'
+        students.forEach(s => {
+            const opt = document.createElement('option')
+            opt.value = s.id
+            opt.textContent = `${s.name}（${s.class}）`
+            select.appendChild(opt)
+        })
+        select.value = prev
+    }
+</script>
+</body>
+</html>
