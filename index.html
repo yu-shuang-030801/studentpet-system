@@ -968,10 +968,146 @@
         .ranking-emoji {
             font-size: 1.5rem;
         }
+
+        /* ============ 老师登录遮罩 ============ */
+        #teacherLoginOverlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        #teacherLoginOverlay .login-card {
+            background: white; border-radius: 16px;
+            padding: 40px 36px; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px; width: 90%;
+            animation: fadeInLogin 0.5s ease;
+        }
+        @keyframes fadeInLogin {
+            from { opacity:0; transform: translateY(30px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+        #teacherLoginOverlay .login-title {
+            font-size: 1.8rem; font-weight:700; color: var(--primary);
+            margin-bottom: 6px;
+        }
+        #teacherLoginOverlay .login-subtitle {
+            font-size: 0.9rem; color: var(--gray); margin-bottom: 28px;
+        }
+        #teacherLoginOverlay .login-input {
+            width: 100%; padding: 14px 16px; font-size: 1.1rem;
+            border: 2px solid var(--gray-light); border-radius: 10px;
+            text-align: center; letter-spacing: 2px;
+            transition: var(--transition);
+        }
+        #teacherLoginOverlay .login-input:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74,144,226,0.15);
+        }
+        #teacherLoginOverlay .login-btn {
+            margin-top: 18px; width:100%; padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; border: none; border-radius: 10px;
+            font-size: 1.1rem; font-weight:600; cursor: pointer;
+            transition: var(--transition);
+        }
+        #teacherLoginOverlay .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74,144,226,0.4);
+        }
+        #teacherLoginOverlay .login-hint {
+            margin-top: 14px; font-size: 0.75rem; color: var(--gray);
+        }
+        #teacherLoginOverlay .teacher-switcher {
+            margin-top: 18px; font-size: 0.85rem; color: var(--primary);
+            cursor: pointer; text-decoration: underline;
+        }
+        /* 教师端顶部栏 */
+        .teacher-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.15); border-radius: var(--border-radius);
+            padding: 10px 20px; margin-bottom: 20px;
+            color: white; font-size: 0.9rem;
+        }
+        .teacher-bar .teacher-name { font-weight:700; font-size:1rem; }
+        .teacher-bar .btn-logout {
+            background: rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.3);
+            padding: 6px 14px; border-radius: 8px; cursor:pointer; font-size:0.8rem;
+        }
+        .teacher-bar .btn-logout:hover { background: rgba(255,255,255,0.35); }
+
+        /* ============ 表扬语言库面板 ============ */
+        .praise-panel {
+            background: linear-gradient(135deg, rgba(255,209,102,0.08), rgba(255,107,107,0.08));
+            border: 1px solid rgba(255,209,102,0.3);
+            border-radius: var(--border-radius); padding: 16px;
+            margin-bottom: 20px;
+        }
+        .praise-panel .panel-title { color: #F0932B; }
+        .praise-list { max-height: 200px; overflow-y: auto; margin: 10px 0; }
+        .praise-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; background: white; border-radius: 8px;
+            margin-bottom: 6px; font-size: 0.85rem; color: var(--dark);
+            border: 1px solid var(--gray-light);
+        }
+        .praise-item .delete-praise {
+            background: none; border: none; color: var(--danger);
+            cursor: pointer; font-size: 1rem; padding: 0 6px;
+        }
+
+        /* ============ 图鉴面板 ============ */
+        .collection-panel {
+            background: linear-gradient(135deg, rgba(157,78,221,0.08), rgba(74,144,226,0.08));
+            border: 1px solid rgba(157,78,221,0.3);
+            border-radius: var(--border-radius); padding: 16px;
+            margin-bottom: 20px;
+        }
+        .collection-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px,1fr));
+            gap: 10px; margin-top: 10px;
+        }
+        .collection-card {
+            background: white; border-radius: 10px; padding: 12px 8px;
+            text-align: center; border: 2px solid var(--gray-light);
+            transition: var(--transition);
+        }
+        .collection-card.maxed {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(157,78,221,0.3);
+        }
+        .collection-card .collect-emoji { font-size: 2rem; }
+        .collection-card .collect-name { font-size: 0.75rem; color: var(--dark); margin-top:4px; }
+        .collection-card .collect-badge {
+            font-size: 0.65rem; background: var(--accent); color:white;
+            padding: 1px 6px; border-radius: 8px; margin-top:4px; display:inline-block;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- 老师登录遮罩 -->
+    <div id="teacherLoginOverlay">
+        <div class="login-card">
+            <div class="login-title">📚 化学学习伙伴</div>
+            <div class="login-subtitle">请输入你的姓名进入管理界面</div>
+            <input type="text" id="teacherNameInput" class="login-input"
+                   placeholder="例如：张老师" maxlength="20"
+                   onkeydown="if(event.key==='Enter') teacherLogin()">
+            <button class="login-btn" onclick="teacherLogin()">🚀 进入我的班级</button>
+            <div class="login-hint">不同老师请输入不同姓名，数据自动隔离</div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer" style="display:none;">
+        <!-- 教师端顶部栏 -->
+        <div class="teacher-bar" id="teacherBar">
+            <div>
+                <span style="opacity:0.7;">当前教师：</span>
+                <span class="teacher-name" id="currentTeacherName"></span>
+            </div>
+            <button class="btn-logout" onclick="teacherLogout()">切换老师</button>
+        </div>
+
         <div class="header">
             <h1 class="game-title">学习伴侣 | 好课在线 | 好老师 提升快</h1>
             <p class="subtitle">Chemistry Learning Partner | 学习任务养成系统 | 支持200名学生 | 成长值=等级 | 6阶段进化</p>
@@ -1229,6 +1365,29 @@
                         <p style="font-size: 0.7rem; color: var(--gray); margin-top: 8px;">
                             当前学生数: <span id="studentCount">0</span> | 数据最后保存: <span id="lastSave">从未保存</span>
                         </p>
+                    </div>
+
+                    <!-- 表扬语言库面板 -->
+                    <div class="praise-panel">
+                        <h3 class="panel-title">🎉 表扬语言库</h3>
+                        <p style="font-size:0.75rem;color:var(--gray);margin-bottom:10px;">
+                            给学生加成长值时，随机选用以下表扬语，显示在学生的成长记录里
+                        </p>
+                        <div style="display:flex;gap:8px;margin-bottom:10px;">
+                            <input type="text" id="newPraiseInput" class="form-input" placeholder="输入新的表扬语"
+                                   style="flex:1;" onkeydown="if(event.key==='Enter') addPraise()">
+                            <button class="btn btn-accent" onclick="addPraise()" style="padding:8px 16px;">添加</button>
+                        </div>
+                        <div class="praise-list" id="praiseList"></div>
+                    </div>
+
+                    <!-- 宠物图鉴面板 -->
+                    <div class="collection-panel">
+                        <h3 class="panel-title">🏆 宠物图鉴</h3>
+                        <p style="font-size:0.75rem;color:var(--gray);margin-bottom:10px;">
+                            学生把宠物养到最高级（30级）后，宠物将收录于此
+                        </p>
+                        <div class="collection-grid" id="collectionGrid"></div>
                     </div>
                 </div>
             </div>
@@ -3077,6 +3236,7 @@ ${petType.emoji[stage.stage]} 学习伴侣 · 好课在线 · 好老师 提升�
     const JSONBIN_API_KEY = '$2a$10$WS6YT56shk8/9DD2C/KJY.z2ihUfIIlGnRy/gTdiXmYPESq9cQ256'
     const JSONBIN_BIN_ID = '6a2e6ad9da38895dfebdafcf'
     const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`
+    const JSONBIN_URL_LATEST = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`
 
     function syncToCloud() {
         const btn = document.getElementById('syncToCloudBtn')
@@ -3118,6 +3278,299 @@ ${petType.emoji[stage.stage]} 学习伴侣 · 好课在线 · 好老师 提升�
             alert('❌ 同步失败：' + err.message + '\n\n请检查网络连接后重试。')
         })
     }
-</script>
+
+    // =====================================================
+    // 多老师系统 + 表扬语言库 + 宠物图鉴
+    // =====================================================
+
+    // --- 老师登录 ---
+    let CURRENT_TEACHER = localStorage.getItem('chemistryTeacherName') || ''
+
+    function teacherLogin() {
+        const name = document.getElementById('teacherNameInput').value.trim()
+        if (!name) { alert('请输入你的姓名'); return }
+        CURRENT_TEACHER = name
+        localStorage.setItem('chemistryTeacherName', name)
+        document.getElementById('teacherLoginOverlay').style.display = 'none'
+        document.getElementById('mainContainer').style.display = ''
+        document.getElementById('currentTeacherName').textContent = name
+        petSystem.loadFromCloud().then(() => {
+            // 首次进入该老师时初始化数据
+            if (!petSystem.teacherData.praiseLibrary) {
+                petSystem.teacherData.praiseLibrary = [
+                    '太棒了！继续保持！', '你真是一个化学小天才！', '进步看得见，加油！',
+                    '每次努力都不会白费！', '你的坚持让人佩服！', '今天的你比昨天更优秀！',
+                    '化学方程式写得越来越好了！', '思维敏捷，未来可期！', '老师为你感到骄傲！',
+                    '继续探索化学的奥秘吧！', '你的努力正在开花结果！', '了不起的进步，继续加油！'
+                ]
+            }
+            petSystem.renderAll()
+            renderPraiseLibrary()
+        })
+    }
+
+    function teacherLogout() {
+        localStorage.removeItem('chemistryTeacherName')
+        CURRENT_TEACHER = ''
+        document.getElementById('mainContainer').style.display = 'none'
+        document.getElementById('teacherLoginOverlay').style.display = 'flex'
+        document.getElementById('teacherNameInput').value = ''
+        document.getElementById('teacherNameInput').focus()
+    }
+
+    // 页面加载时检查是否已登录
+    window.addEventListener('DOMContentLoaded', () => {
+        if (CURRENT_TEACHER) {
+            document.getElementById('teacherLoginOverlay').style.display = 'none'
+            document.getElementById('mainContainer').style.display = ''
+            document.getElementById('currentTeacherName').textContent = CURRENT_TEACHER
+            petSystem.loadFromCloud().then(() => {
+                if (!petSystem.teacherData.praiseLibrary) {
+                    petSystem.teacherData.praiseLibrary = [
+                        '太棒了！继续保持！', '你真是一个化学小天才！', '进步看得见，加油！',
+                        '每次努力都不会白费！', '你的坚持让人佩服！', '今天的你比昨天更优秀！',
+                        '化学方程式写得越来越好了！', '思维敏捷，未来可期！', '老师为你感到骄傲！',
+                        '继续探索化学的奥秘吧！', '你的努力正在开花结果！', '了不起的进步，继续加油！'
+                    ]
+                }
+                petSystem.renderAll()
+                renderPraiseLibrary()
+            })
+        } else {
+            document.getElementById('teacherNameInput').focus()
+        }
+    })
+
+    // --- 覆盖 PetSystem 的数据读写，改为按老师隔离 ---
+    const _origLoad = PetSystem.prototype.loadFromCloud
+    const _origSave = null  // 我们用新的 sync 逻辑
+
+    // 老师专属数据命名空间
+    PetSystem.prototype.getTeacherData = function() {
+        // 从云端全量数据里取当前老师的数据
+        return this.teacherData || { students: [], praiseLibrary: [], collection: [] }
+    }
+
+    PetSystem.prototype.setTeacherData = function(data) {
+        this.teacherData = { ...this.teacherData, ...data }
+        this.students = this.teacherData.students || []
+    }
+
+    // 重写 loadFromCloud：从云端取数后只取当前老师的部分
+    PetSystem.prototype.loadFromCloud = function() {
+        return fetch(JSONBIN_URL_LATEST, {
+            headers: { 'X-Access-Key': JSONBIN_API_KEY }
+        })
+        .then(res => res.ok ? res.json() : null)
+        .then(result => {
+            const allData = result ? result.record : {}
+            if (!allData.teachers) allData.teachers = {}
+            const td = allData.teachers[CURRENT_TEACHER] || { students: [], praiseLibrary: [], collection: [] }
+            this.teacherData = td
+            this.students = td.students || []
+            this.collection = td.collection || []
+            this.praiseLibrary = td.praiseLibrary || []
+            this.renderAll()
+        })
+        .catch(() => {
+            this.students = []
+            this.renderAll()
+        })
+    }
+
+    // 重写 syncToCloud：只写当前老师的数据到云端
+    async function syncToCloudV2() {
+        const btn = document.getElementById('syncToCloudBtn')
+        const status = document.getElementById('syncStatus')
+        btn.disabled = true
+        btn.textContent = '⏳ 正在同步...'
+        btn.style.opacity = '0.7'
+
+        // 先取云端全量数据
+        let allData = {}
+        try {
+            const res = await fetch(JSONBIN_URL_LATEST, {
+                headers: { 'X-Access-Key': JSONBIN_API_KEY }
+            })
+            if (res.ok) allData = (await res.json()).record || {}
+        } catch(e) {}
+
+        if (!allData.teachers) allData.teachers = {}
+
+        allData.teachers[CURRENT_TEACHER] = {
+            students: petSystem.students,
+            praiseLibrary: petSystem.praiseLibrary || [],
+            collection: petSystem.collection || [],
+            lastSync: new Date().toLocaleString()
+        }
+        allData.lastSync = new Date().toLocaleString()
+
+        fetch(JSONBIN_URL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Access-Key': JSONBIN_API_KEY
+            },
+            body: JSON.stringify(allData)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('同步失败: ' + response.status)
+            return response.json()
+        })
+        .then(() => {
+            btn.disabled = false
+            btn.textContent = '☁️ 同步到云端（学生即可查看最新数据）'
+            btn.style.opacity = '1'
+            status.innerHTML = '✅ <span style="color:#2ECC71; font-weight:600;">同步成功！</span> ' + new Date().toLocaleString()
+            // 同时保存到 localStorage 作为备份
+            const td = petSystem.getTeacherData()
+            localStorage.setItem('chemistry_' + CURRENT_TEACHER, JSON.stringify(td))
+        })
+        .catch(err => {
+            btn.disabled = false
+            btn.textContent = '☁️ 同步到云端（学生即可查看最新数据）'
+            btn.style.opacity = '1'
+            status.innerHTML = '❌ <span style="color:#FF4757;">同步失败</span>，请检查网络后重试'
+            alert('❌ 同步失败：' + err.message)
+        })
+    }
+
+    // 覆盖原同步按钮事件
+    window.syncToCloud = syncToCloudV2
+
+    // --- 生成链接时带上 teacher 参数 ---
+    const _origGenSingle = PetSystem.prototype.generateSingleLink
+    PetSystem.prototype.generateSingleLink = function(studentId) {
+        const student = this.students.find(s => s.id === studentId)
+        if (!student) return
+        const baseUrl = 'https://yu-shuang-030801.github.io/studentpet-system/student.html'
+        const link = `${baseUrl}?teacher=${encodeURIComponent(CURRENT_TEACHER)}&name=${encodeURIComponent(student.name)}&class=${encodeURIComponent(student.class)}`
+        document.getElementById('linkResult').style.display = 'block'
+        document.getElementById('studentLinkText').textContent = link
+        this.selectStudent(studentId)
+    }
+
+    const _origGenAll = generateAllLinks
+    window.generateAllLinks = function() {
+        if (petSystem.students.length === 0) { alert('没有学生数据'); return }
+        const baseUrl = 'https://yu-shuang-030801.github.io/studentpet-system/student.html'
+        let links = '📋 学生专属查看链接\n' + '━' + '━'.repeat(20) + '\n\n'
+        petSystem.students.forEach(student => {
+            const link = `${baseUrl}?teacher=${encodeURIComponent(CURRENT_TEACHER)}&name=${encodeURIComponent(student.name)}&class=${encodeURIComponent(student.class)}`
+            links += `${student.name}（${student.class}）\n${link}\n\n`
+        })
+        document.getElementById('linkResultAll').style.display = 'block'
+        document.getElementById('allLinksText').value = links
+    }
+
+    // --- 表扬语言库管理 ---
+    function renderPraiseLibrary() {
+        const list = document.getElementById('praiseList')
+        if (!list) return
+        list.innerHTML = ''
+        const lib = petSystem.praiseLibrary || []
+        lib.forEach((text, idx) => {
+            const div = document.createElement('div')
+            div.className = 'praise-item'
+            div.innerHTML = `
+                <span>${text}</span>
+                <button class="delete-praise" onclick="deletePraise(${idx})">×</button>
+            `
+            list.appendChild(div)
+        })
+    }
+
+    function addPraise() {
+        const input = document.getElementById('newPraiseInput')
+        const text = input.value.trim()
+        if (!text) return
+        if (!petSystem.praiseLibrary) petSystem.praiseLibrary = []
+        petSystem.praiseLibrary.push(text)
+        input.value = ''
+        renderPraiseLibrary()
+    }
+
+    function deletePraise(idx) {
+        petSystem.praiseLibrary.splice(idx, 1)
+        renderPraiseLibrary()
+    }
+
+    // 获取随机表扬语
+    function getRandomPraise() {
+        const lib = petSystem.praiseLibrary || []
+        if (lib.length === 0) return '太棒了！继续加油！'
+        return lib[Math.floor(Math.random() * lib.length)]
+    }
+
+    // 覆盖 addStudyExpToPet：加成长值时附上随机表扬语
+    const _origAddExp = PetSystem.prototype.addStudyExpToPet
+    PetSystem.prototype.addStudyExpToPet = function(student, actionType) {
+        const activity = STUDY_ACTIVITIES[actionType]
+        if (!activity) return
+        const praise = getRandomPraise()
+        const log = {
+            action: actionType,
+            message: `${activity.name} +${activity.exp}成长值 🎉 ${praise}`,
+            timestamp: new Date().toLocaleString(),
+            praise: praise
+        }
+        student.pet.growthLog.unshift(log)
+        student.pet.level += activity.exp
+
+        // 检查是否满级（最高30级），满级后收录图鉴
+        const MAX_LEVEL = 30
+        if (student.pet.level >= MAX_LEVEL && !student.pet.collected) {
+            student.pet.collected = true
+            student.pet.maxLevelReached = true
+            if (!petSystem.collection) petSystem.collection = []
+            petSystem.collection.push({
+                studentName: student.name,
+                studentClass: student.class,
+                petName: student.pet.name,
+                petType: student.pet.type,
+                collectedAt: new Date().toLocaleString()
+            })
+            // 学生可以开启第二只宠物
+            student.pet.canStartNew = true
+        }
+    }
+
+    // --- 图鉴渲染 ---
+    function renderCollection() {
+        const grid = document.getElementById('collectionGrid')
+        if (!grid) return
+        grid.innerHTML = ''
+        const coll = petSystem.collection || []
+        if (coll.length === 0) {
+            grid.innerHTML = '<div style="color:var(--gray);font-size:0.85rem;text-align:center;padding:20px;">暂无满级宠物，学生把宠物养到最高级后自动收录于此 🏆</div>'
+            return
+        }
+        coll.forEach(item => {
+            const typeInfo = PET_TYPES[item.petType] || PET_TYPES.cat
+            const card = document.createElement('div')
+            card.className = 'collection-card maxed'
+            card.innerHTML = `
+                <div class="collect-emoji">${typeInfo.emoji.MAX || '🏆'}</div>
+                <div class="collect-name">${item.petName}</div>
+                <div style="font-size:0.65rem;color:var(--gray);">${item.studentName}（${item.studentClass}）</div>
+                <span class="collect-badge">🏆 满级</span>
+            `
+            grid.appendChild(card)
+        })
+    }
+
+    // 老师端页面加载完成后，渲染图鉴和表扬库
+    const _origRenderAll = PetSystem.prototype.renderAll
+    PetSystem.prototype.renderAll = function() {
+        if (_origRenderAll) _origRenderAll.call(this)
+        renderPraiseLibrary()
+        renderCollection()
+        // 更新学生端链接 baseUrl 提示
+        const hint = document.getElementById('currentTeacherHint')
+        if (hint) hint.textContent = `当前教师：${CURRENT_TEACHER}（链接已包含教师参数）`
+    }
+
+    console.log('✅ 多老师系统 + 表扬语言库 + 宠物图鉴 已加载')
+    </script>
 </body>
 </html>
