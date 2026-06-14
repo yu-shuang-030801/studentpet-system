@@ -237,12 +237,19 @@ function showError(msg) {
     `
 }
 
-// 从 URL 参数读取学生数据（支持新版 data= 编码模式）
+// 云端配置
+const JSONBIN_API_KEY = '$2a$10$WS6YT56shk8/9DD2C/KJY.z2ihUfIIlGnRy/gTdiXmYPESq9cQ256'
+const JSONBIN_BIN_ID = '6a2e6ad9da38895dfebdafcf'
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`
+
+// 从 URL 参数读取
 const params = new URLSearchParams(window.location.search)
 const encodedData = params.get('data')
+const studentName = params.get('name')
+const studentClass = params.get('class')
 
 if (encodedData) {
-    // 新版：从 data 参数解码出完整学生数据
+    // 兼容旧版 data= 编码链接
     try {
         const decoded = decodeURIComponent(escape(atob(decodeURIComponent(encodedData))))
         const student = JSON.parse(decoded)
@@ -254,42 +261,38 @@ if (encodedData) {
     } catch(e) {
         showError('链接解析失败，请联系老师重新生成链接')
     }
-} else {
-    // 兼容旧版链接（name + class 参数）
-    const name = params.get('name')
-    const className = params.get('class')
-
-    if (!name || !className) {
-        showError('链接不完整，请联系老师获取正确的专属链接')
-    } else {
-        // 旧版尝试从 localStorage 读（仅在同一设备打开教师端时有效）
-        try {
-            const saved = localStorage.getItem('englishLearningPartnerData')
-            if (!saved) {
-                showError(`链接已过期或在其他设备上打开<br><br>
-                    <span style="font-size:12px; color:#999;">
-                        请联系老师，让老师重新生成你的专属链接<br>
-                        （新版链接可在任意设备查看）
-                    </span>`)
-            } else {
-                const data = JSON.parse(saved)
-                const student = data.students
-                    ? data.students.find(s => s.name === name && s.class === className)
-                    : null
-                if (!student) {
-                    showError(`未找到你的学习伙伴<br><br>
-                        <span style="font-size:12px; color:#999;">
-                            姓名：${name}　班级：${className}<br><br>
-                            请联系老师重新生成专属链接
-                        </span>`)
-                } else {
-                    renderStudentPet(student)
-                }
-            }
-        } catch(e) {
-            showError('数据读取失败，请联系老师重新生成链接')
+} else if (studentName && studentClass) {
+    // 新版：从云端读取数据，根据 name+class 找到对应学生
+    fetch(JSONBIN_URL, {
+        headers: { 'X-Access-Key': JSONBIN_API_KEY }
+    })
+    .then(response => {
+        if(!response.ok) throw new Error('读取失败')
+        return response.json()
+    })
+    .then(result => {
+        const data = result.record
+        if(!data || !data.students) {
+            showError('云端暂无数据，请让老师先同步数据到云端')
+            return
         }
-    }
+        const student = data.students.find(s => s.name === studentName && s.class === studentClass)
+        if(!student) {
+            showError(`未找到你的学习伙伴<br><br>
+                <span style="font-size:12px; color:#999;">
+                    姓名：${studentName}　班级：${studentClass}<br><br>
+                    请确认链接是否正确，或联系老师
+                </span>`)
+        } else {
+            renderStudentPet(student)
+        }
+    })
+    .catch(err => {
+        showError('无法读取云端数据，请检查网络连接后刷新页面重试<br><br>' +
+            '<span style="font-size:12px; color:#999;">如果持续无法加载，请联系老师确认是否已同步数据到云端</span>')
+    })
+} else {
+    showError('链接不完整，请联系老师获取正确的专属链接')
 }
 
 function renderStudentPet(student) {
