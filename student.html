@@ -274,6 +274,8 @@ function getEvolutionStage(level) {
     if(level >= 5) return { stage: 1, text: '✨ 微粒小能手', color: '#9D4EDD' }
     return { stage: 0, text: '⭐ 化学小萌新', color: '#4A90E2' }
 }
+const MAX_LEVEL = 100
+const STAGE_THRESHOLDS = [0, 5, 15, 30, 50, 80]
 
 function getMood(level) {
     if(level >= 80) return '状态极佳，学习力爆棚 🚀\n我的主人太厉害了！'
@@ -319,8 +321,9 @@ if (encodedData) {
     } catch(e) {
         showError('链接解析失败，请联系老师重新生成链接')
     }
-} else if (teacherName && studentName && studentClass) {
-    // 新版：带 teacher 参数，从云端读取该老师的数据
+} else if ((teacherName && studentName && studentClass) || (studentName && studentClass)) {
+    // 有 teacher 参数 或 仅有 name+class，都从云端读取
+    const targetTeacher = teacherName || ''
     showLoading('正在连接老师的数据…')
     fetch(JSONBIN_URL, {
         headers: { 'X-Access-Key': JSONBIN_API_KEY }
@@ -331,27 +334,43 @@ if (encodedData) {
     })
     .then(result => {
         const allData = result.record || {}
-        const teachersData = allData.teachers || {}
-        const teacherData = teachersData[teacherName]
+        let students = []
+        let collection = []
 
-        if (!teacherData) {
-            showError(`未找到「${teacherName}」老师的数据<br><br>
-                <span style="font-size:12px;color:#999;">
-                    请确认链接中的老师姓名是否正确，或联系老师重新生成链接
-                </span>`)
-            return
+        if (allData.teachers) {
+            // 新格式：按老师分数据
+            if (targetTeacher && allData.teachers[targetTeacher]) {
+                students = allData.teachers[targetTeacher].students || []
+                collection = allData.teachers[targetTeacher].collection || []
+            } else if (!targetTeacher) {
+                // 旧链接没有 teacher 参数，遍历所有老师找学生
+                for (const tName in allData.teachers) {
+                    const s = (allData.teachers[tName].students || []).find(
+                        s => s.name === studentName && s.class === studentClass
+                    )
+                    if (s) { students = allData.teachers[tName].students; collection = allData.teachers[tName].collection || []; break }
+                }
+            } else {
+                showError(`未找到「${targetTeacher}」老师的数据<br><br>
+                    <span style="font-size:12px;color:#999;">
+                        请确认老师姓名是否正确，或让老师先同步数据到云端
+                    </span>`)
+                return
+            }
+        } else if (allData.students) {
+            // 旧格式：没有 teachers 键，直接就是 students 数组
+            students = allData.students
+            collection = []
         }
 
-        const students = teacherData.students || []
-        const collection = teacherData.collection || []
         const student = students.find(s => s.name === studentName && s.class === studentClass)
 
         if (!student) {
             showError(`未找到你的学习伙伴<br><br>
                 <span style="font-size:12px;color:#999;">
                     姓名：${studentName}　班级：${studentClass}<br>
-                    老师：${teacherName}<br><br>
-                    请确认链接是否正确，或联系老师
+                    ${targetTeacher ? '老师：' + targetTeacher + '<br>' : ''}<br>
+                    请确认链接是否正确，或让老师先同步数据到云端
                 </span>`)
             return
         }
@@ -361,40 +380,6 @@ if (encodedData) {
     .catch(err => {
         showError('无法读取云端数据，请检查网络连接后刷新页面重试<br><br>' +
             '<span style="font-size:12px;color:#999;">如果持续无法加载，请联系老师确认是否已同步数据到云端</span>')
-    })
-} else if (studentName && studentClass) {
-    // 兼容：只有 name+class 但没有 teacher（旧链接格式）
-    showLoading('正在读取数据（旧版链接）…')
-    fetch(JSONBIN_URL, {
-        headers: { 'X-Access-Key': JSONBIN_API_KEY }
-    })
-    .then(response => {
-        if(!response.ok) throw new Error('读取失败')
-        return response.json()
-    })
-    .then(result => {
-        const allData = result.record || {}
-        // 在所有老师的数据里找这个学生
-        const teachersData = allData.teachers || {}
-        let foundStudent = null
-        let foundCollection = []
-        for (const tName in teachersData) {
-            const s = (teachersData[tName].students || []).find(
-                s => s.name === studentName && s.class === studentClass
-            )
-            if (s) { foundStudent = s; foundCollection = teachersData[tName].collection || []; break }
-        }
-        if (!foundStudent) {
-            showError(`未找到你的学习伙伴<br><br>
-                <span style="font-size:12px;color:#999;">
-                    这是旧版链接，可能已失效。<br>请联系老师重新生成你的专属链接。
-                </span>`)
-        } else {
-            renderStudentPet(foundStudent, foundCollection)
-        }
-    })
-    .catch(err => {
-        showError('无法读取云端数据，请检查网络连接后刷新页面重试')
     })
 } else {
     showError('链接不完整，请联系老师获取正确的专属链接')
@@ -423,25 +408,26 @@ function renderStudentPet(student, collection) {
     }
 
     // 计算进化进度
-    const stageThresholds = [0, 5, 15, 30, 50, 80]
-    const currentThreshold = stageThresholds[stage.stage]
-    const nextThreshold = stage.stage < 5 ? stageThresholds[stage.stage + 1] : null
+    const currentThreshold = STAGE_THRESHOLDS[stage.stage]
+    const nextThreshold = stage.stage < 5 ? STAGE_THRESHOLDS[stage.stage + 1] : null
     let progressHtml = ''
-    if (nextThreshold) {
-        const progress = ((pet.level - currentThreshold) / (nextThreshold - currentThreshold)) * 100
-        progressHtml = `
-            <div style="margin-top:8px;">
-                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:3px;">
-                    <span>进化进度</span>
-                    <span>${pet.level}/${nextThreshold}</span>
+    if (pet.level < MAX_LEVEL) {
+        if (nextThreshold) {
+            const progress = ((pet.level - currentThreshold) / (nextThreshold - currentThreshold)) * 100
+            progressHtml = `
+                <div style="margin-top:8px;">
+                    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:3px;">
+                        <span>进化进度</span>
+                        <span>${pet.level}/${nextThreshold}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:${Math.min(progress,100)}%"></div>
+                    </div>
                 </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width:${Math.min(progress,100)}%"></div>
-                </div>
-            </div>
-        `
+            `
+        }
     } else {
-        progressHtml = `<div style="margin-top:8px;font-size:12px;color:var(--accent);font-weight:600;">🏆 已满级！</div>`
+        progressHtml = `<div style="margin-top:8px;font-size:12px;color:var(--accent);font-weight:600;">🏆 已满级（Lv.${MAX_LEVEL}）！</div>`
     }
 
     // 学习记录（显示表扬语）
@@ -454,7 +440,6 @@ function renderStudentPet(student, collection) {
 
     let logHtml = ''
     if (pet.growthLog && pet.growthLog.length > 0) {
-        // 只显示最近20条
         const recentLogs = pet.growthLog.slice(0, 20)
         recentLogs.forEach(log => {
             const an = actionNames[log.action] || '✨ 学习'
@@ -505,13 +490,25 @@ function renderStudentPet(student, collection) {
         `
     }
 
-    // 第二只宠物按钮（满级后可出现）
+    // 第二只宠物按钮（满级后可选择新宠物）
     let newPetHtml = ''
-    if (pet.maxLevelReached || pet.level >= 30) {
+    if (pet.level >= MAX_LEVEL || pet.maxLevelReached) {
+        // 生成宠物选择列表
+        let petOptionsHtml = ''
+        Object.keys(PET_TYPES).forEach(type => {
+            const pt = PET_TYPES[type]
+            petOptionsHtml += `<option value="${type}">${pt.emoji[0]} ${pt.name}</option>`
+        })
         newPetHtml = `
-            <button class="new-pet-btn" onclick="alert('🎉 恭喜你的宠物已满级！\\n\\n请联系老师，让老师帮你开启第二只宠物的养成之旅！')">
-                🐣 开启第二只宠物养成
-            </button>
+            <div style="margin-top:14px;padding:16px;background:linear-gradient(135deg,rgba(157,78,221,0.08),rgba(74,144,226,0.08));border-radius:12px;border:1px solid rgba(157,78,221,0.2);">
+                <div style="font-size:14px;font-weight:600;color:var(--accent);margin-bottom:10px;">🎉 恭喜满级！可以开启第二只宠物！</div>
+                <select id="newPetSelect" style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:8px;background:white;">
+                    ${petOptionsHtml}
+                </select>
+                <button class="new-pet-btn" onclick="startNewPet()">
+                    🐣 开启新宠物养成之旅
+                </button>
+            </div>
         `
     }
 
@@ -548,6 +545,11 @@ function renderStudentPet(student, collection) {
             <span style="font-size:10px;color:#bbb;">数据由老师端同步更新，刷新页面可获取最新数据</span>
         </div>
     `
+}
+
+// 开启新宠物：提示学生联系老师操作
+function startNewPet() {
+    alert('🎉 请联系老师，让老师帮你开启第二只宠物！\n\n老师端可以选择新的宠物类型并重置等级，你就可以从1级开始养新宠物啦～')
 }
 </script>
 </body>
