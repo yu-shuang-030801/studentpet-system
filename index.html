@@ -2049,9 +2049,16 @@
             
             const newStage = this.getEvolutionStage(pet.level).stage
             
+            // 从表扬语库中随机选取一条表扬语
+            let randomPraise = ''
+            if (this.praiseLibrary && this.praiseLibrary.length > 0) {
+                randomPraise = this.praiseLibrary[Math.floor(Math.random() * this.praiseLibrary.length)]
+            }
+
             pet.growthLog.unshift({
                 action: actionType,
                 message: activity.message,
+                praise: randomPraise,
                 timestamp: new Date().toLocaleString()
             })
             
