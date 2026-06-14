@@ -342,20 +342,63 @@ if (encodedData) {
             if (targetTeacher && allData.teachers[targetTeacher]) {
                 students = allData.teachers[targetTeacher].students || []
                 collection = allData.teachers[targetTeacher].collection || []
-            } else if (!targetTeacher) {
-                // 旧链接没有 teacher 参数，遍历所有老师找学生
+            } else if (targetTeacher && !allData.teachers[targetTeacher]) {
+                // 指定了老师但找不到，先尝试在所有老师数据中找该学生
+                let found = false
                 for (const tName in allData.teachers) {
                     const s = (allData.teachers[tName].students || []).find(
                         s => s.name === studentName && s.class === studentClass
                     )
-                    if (s) { students = allData.teachers[tName].students; collection = allData.teachers[tName].collection || []; break }
+                    if (s) {
+                        students = allData.teachers[tName].students
+                        collection = allData.teachers[tName].collection || []
+                        found = true
+                        break
+                    }
                 }
-            } else {
-                showError(`未找到「${targetTeacher}」老师的数据<br><br>
-                    <span style="font-size:12px;color:#999;">
-                        请确认老师姓名是否正确，或让老师先同步数据到云端
-                    </span>`)
-                return
+                // 如果所有老师数据中都找不到，再尝试顶层旧格式 students
+                if (!found && allData.students && allData.students.length > 0) {
+                    const s = allData.students.find(
+                        s => s.name === studentName && s.class === studentClass
+                    )
+                    if (s) {
+                        students = allData.students
+                        collection = []
+                        found = true
+                    }
+                }
+                if (!found) {
+                    showError(`未找到「${targetTeacher}」老师的数据<br><br>
+                        <span style="font-size:12px;color:#999;">
+                            可能是老师还没同步数据到云端，或者老师姓名有变化<br>
+                            请让老师确认姓名后重新同步
+                        </span>`)
+                    return
+                }
+            } else if (!targetTeacher) {
+                // 旧链接没有 teacher 参数，遍历所有老师找学生
+                let found = false
+                for (const tName in allData.teachers) {
+                    const s = (allData.teachers[tName].students || []).find(
+                        s => s.name === studentName && s.class === studentClass
+                    )
+                    if (s) { students = allData.teachers[tName].students; collection = allData.teachers[tName].collection || []; found = true; break }
+                }
+                // 也尝试顶层旧格式
+                if (!found && allData.students && allData.students.length > 0) {
+                    const s = allData.students.find(
+                        s => s.name === studentName && s.class === studentClass
+                    )
+                    if (s) { students = allData.students; collection = []; found = true }
+                }
+                if (!found) {
+                    showError(`未找到你的学习伙伴<br><br>
+                        <span style="font-size:12px;color:#999;">
+                            姓名：${studentName}　班级：${studentClass}<br>
+                            请确认链接是否正确，或让老师先同步数据到云端
+                        </span>`)
+                    return
+                }
             }
         } else if (allData.students) {
             // 旧格式：没有 teachers 键，直接就是 students 数组
