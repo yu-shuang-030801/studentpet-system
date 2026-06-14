@@ -136,6 +136,11 @@ body {
     color: #666;
     margin-top: 1px;
 }
+.log-praise {
+    color: var(--accent);
+    font-weight: 600;
+    margin-top: 2px;
+}
 .log-time {
     font-size: 10px;
     color: #bbb;
@@ -174,6 +179,57 @@ body {
     background: linear-gradient(90deg, var(--primary), var(--accent));
     border-radius: 4px;
     transition: width 0.5s ease;
+}
+/* 图鉴样式 */
+.collection-section {
+    margin-top: 18px;
+    text-align: left;
+}
+.collection-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 8px;
+}
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+.collection-card {
+    background: #fafafa;
+    border-radius: 8px;
+    padding: 8px 4px;
+    text-align: center;
+    border: 2px solid var(--gray-light);
+}
+.collection-card.maxed {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(157,78,221,0.08), rgba(74,144,226,0.08));
+}
+.collect-emoji { font-size: 28px; }
+.collect-name { font-size: 10px; color: var(--dark); margin-top: 2px; font-weight: 600; }
+.collect-badge {
+    font-size: 9px; background: var(--accent); color: white;
+    padding: 1px 5px; border-radius: 6px; margin-top: 2px; display: inline-block;
+}
+/* 第二只宠物按钮 */
+.new-pet-btn {
+    margin-top: 14px;
+    background: linear-gradient(135deg, var(--accent), #8A2BE2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+.new-pet-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(157,78,221,0.4);
 }
 </style>
 </head>
@@ -237,32 +293,35 @@ function showError(msg) {
     `
 }
 
-// 云端配置
+// ============ 云端配置 ============
 const JSONBIN_API_KEY = '$2a$10$WS6YT56shk8/9DD2C/KJY.z2ihUfIIlGnRy/gTdiXmYPESq9cQ256'
 const JSONBIN_BIN_ID = '6a2e6ad9da38895dfebdafcf'
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`
 
-// 从 URL 参数读取
+// ============ 从 URL 参数读取 ============
 const params = new URLSearchParams(window.location.search)
-const encodedData = params.get('data')
+const teacherName = params.get('teacher')   // 新增：老师名
 const studentName = params.get('name')
 const studentClass = params.get('class')
+const encodedData = params.get('data')     // 兼容旧版
 
+// ============ 主逻辑 ============
 if (encodedData) {
     // 兼容旧版 data= 编码链接
     try {
         const decoded = decodeURIComponent(escape(atob(decodeURIComponent(encodedData))))
         const student = JSON.parse(decoded)
         if (student && student.name) {
-            renderStudentPet(student)
+            renderStudentPet(student, [])
         } else {
             showError('链接数据格式有误，请联系老师重新生成链接')
         }
     } catch(e) {
         showError('链接解析失败，请联系老师重新生成链接')
     }
-} else if (studentName && studentClass) {
-    // 新版：从云端读取数据，根据 name+class 找到对应学生
+} else if (teacherName && studentName && studentClass) {
+    // 新版：带 teacher 参数，从云端读取该老师的数据
+    showLoading('正在连接老师的数据…')
     fetch(JSONBIN_URL, {
         headers: { 'X-Access-Key': JSONBIN_API_KEY }
     })
@@ -271,31 +330,85 @@ if (encodedData) {
         return response.json()
     })
     .then(result => {
-        const data = result.record
-        if(!data || !data.students) {
-            showError('云端暂无数据，请让老师先同步数据到云端')
+        const allData = result.record || {}
+        const teachersData = allData.teachers || {}
+        const teacherData = teachersData[teacherName]
+
+        if (!teacherData) {
+            showError(`未找到「${teacherName}」老师的数据<br><br>
+                <span style="font-size:12px;color:#999;">
+                    请确认链接中的老师姓名是否正确，或联系老师重新生成链接
+                </span>`)
             return
         }
-        const student = data.students.find(s => s.name === studentName && s.class === studentClass)
-        if(!student) {
+
+        const students = teacherData.students || []
+        const collection = teacherData.collection || []
+        const student = students.find(s => s.name === studentName && s.class === studentClass)
+
+        if (!student) {
             showError(`未找到你的学习伙伴<br><br>
-                <span style="font-size:12px; color:#999;">
-                    姓名：${studentName}　班级：${studentClass}<br><br>
+                <span style="font-size:12px;color:#999;">
+                    姓名：${studentName}　班级：${studentClass}<br>
+                    老师：${teacherName}<br><br>
                     请确认链接是否正确，或联系老师
                 </span>`)
-        } else {
-            renderStudentPet(student)
+            return
         }
+
+        renderStudentPet(student, collection)
     })
     .catch(err => {
         showError('无法读取云端数据，请检查网络连接后刷新页面重试<br><br>' +
-            '<span style="font-size:12px; color:#999;">如果持续无法加载，请联系老师确认是否已同步数据到云端</span>')
+            '<span style="font-size:12px;color:#999;">如果持续无法加载，请联系老师确认是否已同步数据到云端</span>')
+    })
+} else if (studentName && studentClass) {
+    // 兼容：只有 name+class 但没有 teacher（旧链接格式）
+    showLoading('正在读取数据（旧版链接）…')
+    fetch(JSONBIN_URL, {
+        headers: { 'X-Access-Key': JSONBIN_API_KEY }
+    })
+    .then(response => {
+        if(!response.ok) throw new Error('读取失败')
+        return response.json()
+    })
+    .then(result => {
+        const allData = result.record || {}
+        // 在所有老师的数据里找这个学生
+        const teachersData = allData.teachers || {}
+        let foundStudent = null
+        let foundCollection = []
+        for (const tName in teachersData) {
+            const s = (teachersData[tName].students || []).find(
+                s => s.name === studentName && s.class === studentClass
+            )
+            if (s) { foundStudent = s; foundCollection = teachersData[tName].collection || []; break }
+        }
+        if (!foundStudent) {
+            showError(`未找到你的学习伙伴<br><br>
+                <span style="font-size:12px;color:#999;">
+                    这是旧版链接，可能已失效。<br>请联系老师重新生成你的专属链接。
+                </span>`)
+        } else {
+            renderStudentPet(foundStudent, foundCollection)
+        }
+    })
+    .catch(err => {
+        showError('无法读取云端数据，请检查网络连接后刷新页面重试')
     })
 } else {
     showError('链接不完整，请联系老师获取正确的专属链接')
 }
 
-function renderStudentPet(student) {
+function showLoading(msg) {
+    document.getElementById('content').innerHTML = `
+        <div style="font-size:48px;margin-bottom:12px;">🔐</div>
+        <p class="loading">${msg}</p>
+    `
+}
+
+// ============ 渲染学生宠物页面 ============
+function renderStudentPet(student, collection) {
     const pet = student.pet
     const petType = PET_TYPES[pet.type] || PET_TYPES.cat
     const stage = getEvolutionStage(pet.level)
@@ -309,7 +422,7 @@ function renderStudentPet(student) {
         Object.values(pet.studyStats).forEach(v => totalStudy += (v || 0))
     }
 
-    // 计算进化进度（到下一级还需多少成长值）
+    // 计算进化进度
     const stageThresholds = [0, 5, 15, 30, 50, 80]
     const currentThreshold = stageThresholds[stage.stage]
     const nextThreshold = stage.stage < 5 ? stageThresholds[stage.stage + 1] : null
@@ -317,40 +430,40 @@ function renderStudentPet(student) {
     if (nextThreshold) {
         const progress = ((pet.level - currentThreshold) / (nextThreshold - currentThreshold)) * 100
         progressHtml = `
-            <div style="margin-top: 8px;">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--gray); margin-bottom: 3px;">
+            <div style="margin-top:8px;">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:3px;">
                     <span>进化进度</span>
                     <span>${pet.level}/${nextThreshold}</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
+                    <div class="progress-fill" style="width:${Math.min(progress,100)}%"></div>
                 </div>
             </div>
         `
     } else {
-        progressHtml = `<div style="margin-top: 8px; font-size: 12px; color: var(--accent); font-weight: 600;">🏆 已满级！</div>`
+        progressHtml = `<div style="margin-top:8px;font-size:12px;color:var(--accent);font-weight:600;">🏆 已满级！</div>`
     }
 
-    // 学习记录
+    // 学习记录（显示表扬语）
     const actionNames = {
-        note: '📝 笔记',
-        practice: '📖 练习',
-        course: '✅ 完课',
-        vocabulary: '🔤 方程式打卡',
-        dailyQuestion: '❓ 每日一题',
-        composition: '✍️ 班级作业',
-        video: '📺 接听视频',
+        note: '📝 笔记', practice: '📖 练习', course: '✅ 完课',
+        vocabulary: '🔤 方程式打卡', dailyQuestion: '❓ 每日一题',
+        composition: '✍️ 班级作业', video: '📺 接听视频',
         dictation: '🎧 思维导图'
     }
 
     let logHtml = ''
     if (pet.growthLog && pet.growthLog.length > 0) {
-        pet.growthLog.forEach(log => {
+        // 只显示最近20条
+        const recentLogs = pet.growthLog.slice(0, 20)
+        recentLogs.forEach(log => {
             const an = actionNames[log.action] || '✨ 学习'
+            const praiseHtml = log.praise ? `<div class="log-praise">🎉 ${log.praise}</div>` : ''
             logHtml += `
                 <div class="log-item">
                     <div class="log-action">${an}</div>
-                    <div class="log-message">${log.message}</div>
+                    <div class="log-message">${log.message || ''}</div>
+                    ${praiseHtml}
                     <div class="log-time">${log.timestamp || ''}</div>
                 </div>
             `
@@ -370,8 +483,40 @@ function renderStudentPet(student) {
         `
     }
 
+    // 图鉴展示（该老师班级所有满级宠物）
+    let collectionHtml = ''
+    if (collection && collection.length > 0) {
+        let cardsHtml = ''
+        collection.forEach(item => {
+            const t = PET_TYPES[item.petType] || PET_TYPES.cat
+            cardsHtml += `
+                <div class="collection-card maxed">
+                    <div class="collect-emoji">${t.emoji[5] || '🏆'}</div>
+                    <div class="collect-name">${item.petName}</div>
+                    <span class="collect-badge">🏆 ${item.studentName}</span>
+                </div>
+            `
+        })
+        collectionHtml = `
+            <div class="collection-section">
+                <div class="collection-title">🏆 班级宠物图鉴（满级）</div>
+                <div class="collection-grid">${cardsHtml}</div>
+            </div>
+        `
+    }
+
+    // 第二只宠物按钮（满级后可出现）
+    let newPetHtml = ''
+    if (pet.maxLevelReached || pet.level >= 30) {
+        newPetHtml = `
+            <button class="new-pet-btn" onclick="alert('🎉 恭喜你的宠物已满级！\\n\\n请联系老师，让老师帮你开启第二只宠物的养成之旅！')">
+                🐣 开启第二只宠物养成
+            </button>
+        `
+    }
+
     document.getElementById('content').innerHTML = `
-        <div class="pet-avatar" style="background: linear-gradient(135deg, ${color}, #FFD166);">
+        <div class="pet-avatar" style="background:linear-gradient(135deg,${color},#FFD166);">
             ${emoji}
         </div>
         <div class="pet-name">${pet.name}</div>
@@ -379,7 +524,7 @@ function renderStudentPet(student) {
         <div class="level">Lv.${pet.level}　成长值：${pet.level}</div>
         <div class="stage" style="color:${stage.color};">${stage.text}</div>
 
-        <div class="mood">${mood.replace('\n', '<br>')}</div>
+        <div class="mood">${mood.replace('\n','<br>')}</div>
 
         ${commentHtml}
 
@@ -389,14 +534,18 @@ function renderStudentPet(student) {
 
         ${progressHtml}
 
-        <div style="margin-top: 18px;">
+        <div style="margin-top:18px;">
             <div class="log-title">📝 最近学习记录</div>
             <div style="max-height:220px;overflow-y:auto;">${logHtml}</div>
         </div>
 
+        ${collectionHtml}
+
+        ${newPetHtml}
+
         <div class="footer">
             学习伴侣 · 好课在线 · 好老师 提升快<br>
-            <span style="font-size:10px;color:#bbb;">数据由老师端同步更新</span>
+            <span style="font-size:10px;color:#bbb;">数据由老师端同步更新，刷新页面可获取最新数据</span>
         </div>
     `
 }
