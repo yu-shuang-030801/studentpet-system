@@ -228,11 +228,6 @@ function getMood(level) {
     return '等待主人带我升级 🌱\n快来学习吧！'
 }
 
-// 读取 URL 参数
-const params = new URLSearchParams(window.location.search)
-const name = params.get('name')
-const className = params.get('class')
-
 function showError(msg) {
     document.getElementById('content').innerHTML = `
         <div class="error">
@@ -242,81 +237,57 @@ function showError(msg) {
     `
 }
 
-// 如果没有任何数据（第一次全班访问）
-if (!saved) {
-    // ✅ 自动创建一个默认的宠物数据
-    const defaultPetData = {
-        students: [{
-            name: name,
-            class: className,
-            pet: {
-                name: '我的学习伙伴',
-                type: 'cat',
-                level: 1,
-                growthLog: [],
-                studyStats: {},
-                teacherComment: '欢迎来到化学世界，快去学习吧！'
-            }
-        }]
-    };
-    // 存入浏览器
-    localStorage.setItem('englishLearningPartnerData', JSON.stringify(defaultPetData));
-    // 直接渲染这个默认宠物
-    renderStudentPet(defaultPetData.students[0]);
+// 从 URL 参数读取学生数据（支持新版 data= 编码模式）
+const params = new URLSearchParams(window.location.search)
+const encodedData = params.get('data')
 
-} else {
-    // 如果有数据，正常查找学生
+if (encodedData) {
+    // 新版：从 data 参数解码出完整学生数据
     try {
-        const data = JSON.parse(saved);
-        const student = data.students
-            ? data.students.find(s => s.name === name && s.class === className)
-            : null;
-
-        if (!student) {
-            showError(`未找到你的学习伙伴<br><br>
-                <span style="font-size:12px; color:#999;">
-                    姓名：${name}<br>
-                    班级：${className}<br><br>
-                    请确认链接是否正确，或联系老师
-                </span>`
-            );
+        const decoded = decodeURIComponent(escape(atob(decodeURIComponent(encodedData))))
+        const student = JSON.parse(decoded)
+        if (student && student.name) {
+            renderStudentPet(student)
         } else {
-            renderStudentPet(student);
+            showError('链接数据格式有误，请联系老师重新生成链接')
         }
     } catch(e) {
-        showError('数据读取失败，请稍后再试');
+        showError('链接解析失败，请联系老师重新生成链接')
     }
-}
+} else {
+    // 兼容旧版链接（name + class 参数）
+    const name = params.get('name')
+    const className = params.get('class')
 
-    // 尝试读取数据
-    const saved = localStorage.getItem('englishLearningPartnerData')
-    if (!saved) {
-        document.getElementById('content').innerHTML = `
-            <div class="error">
-                ⚠️ 暂时无法读取数据<br><br>
-                <span style="font-size:12px; color:#999;">请稍后再试，或联系老师</span>
-            </div>
-        `
+    if (!name || !className) {
+        showError('链接不完整，请联系老师获取正确的专属链接')
     } else {
+        // 旧版尝试从 localStorage 读（仅在同一设备打开教师端时有效）
         try {
-            const data = JSON.parse(saved)
-            const student = data.students
-                ? data.students.find(s => s.name === name && s.class === className)
-                : null
-
-            if (!student) {
-                showError(`未找到你的学习伙伴<br><br>
+            const saved = localStorage.getItem('englishLearningPartnerData')
+            if (!saved) {
+                showError(`链接已过期或在其他设备上打开<br><br>
                     <span style="font-size:12px; color:#999;">
-                        姓名：${name}<br>
-                        班级：${className}<br><br>
-                        请确认链接是否正确，或联系老师
-                    </span>`
-                )
+                        请联系老师，让老师重新生成你的专属链接<br>
+                        （新版链接可在任意设备查看）
+                    </span>`)
             } else {
-                renderStudentPet(student)
+                const data = JSON.parse(saved)
+                const student = data.students
+                    ? data.students.find(s => s.name === name && s.class === className)
+                    : null
+                if (!student) {
+                    showError(`未找到你的学习伙伴<br><br>
+                        <span style="font-size:12px; color:#999;">
+                            姓名：${name}　班级：${className}<br><br>
+                            请联系老师重新生成专属链接
+                        </span>`)
+                } else {
+                    renderStudentPet(student)
+                }
             }
         } catch(e) {
-            showError('数据读取失败，请稍后再试')
+            showError('数据读取失败，请联系老师重新生成链接')
         }
     }
 }
