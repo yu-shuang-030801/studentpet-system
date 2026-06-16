@@ -336,13 +336,24 @@ function showQueryForm(prefillTeacher, prefillName) {
 
         <div style="text-align:left;margin-bottom:12px;">
             <label style="font-size:13px;color:#374151;font-weight:600;display:block;margin-bottom:4px;">老师名字</label>
-            <input id="qTeacher" type="text" placeholder="例如：菲菲老师"
-                value="${prefillTeacher || ''}"
+            <select id="qTeacher"
                 style="width:100%;box-sizing:border-box;padding:11px 14px;border:2px solid #E5E7EB;
-                    border-radius:10px;font-size:15px;outline:none;transition:border-color .2s;"
+                    border-radius:10px;font-size:15px;outline:none;transition:border-color .2s;
+                    background:white;cursor:pointer;appearance:none;-webkit-appearance:none;-moz-appearance:none;
+                    background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E&quot;);
+                    background-repeat:no-repeat;background-position:right 14px center;"
                 onfocus="this.style.borderColor='#667eea'"
-                onblur="this.style.borderColor='#E5E7EB'"
-                onkeydown="if(event.key==='Enter')document.getElementById('qName').focus()">
+                onblur="this.style.borderColor='#E5E7EB'">
+                <option value="" disabled selected>👇 请选择老师</option>
+                <option value="双双老师" ${prefillTeacher==='双双老师'?'selected':''}>双双老师</option>
+                <option value="菲菲老师" ${prefillTeacher==='菲菲老师'?'selected':''}>菲菲老师</option>
+                <option value="鑫鑫老师" ${prefillTeacher==='鑫鑫老师'?'selected':''}>鑫鑫老师</option>
+                <option value="瀚中老师" ${prefillTeacher==='瀚中老师'?'selected':''}>瀚中老师</option>
+                <option value="垂馨老师" ${prefillTeacher==='垂馨老师'?'selected':''}>垂馨老师</option>
+                <option value="桃红老师" ${prefillTeacher==='桃红老师'?'selected':''}>桃红老师</option>
+                <option value="慧慧老师" ${prefillTeacher==='慧慧老师'?'selected':''}>慧慧老师</option>
+                <option value="子川老师" ${prefillTeacher==='子川老师'?'selected':''}>子川老师</option>
+            </select>
         </div>
 
         <div style="text-align:left;margin-bottom:20px;">
