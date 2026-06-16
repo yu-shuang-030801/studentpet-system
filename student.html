@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>我的学习伙伴</title>
+<!-- 腾讯云 CloudBase SDK -->
+<script src="https://static.cloudbase.net/cloudbase-js-sdk/2.28.6/cloudbase.full.js"></script>
 
 <style>
 :root {
@@ -301,10 +303,29 @@ function showError(msg) {
     `
 }
 
-// ============ 云端配置 ============
+// ============ 云端配置（腾讯云 CloudBase） ============
+const CB_ENV = 'studentpet-d4g0uv0qo2d82dcd0'
+const CB_ACCESS_KEY = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjlkMWRjMzFlLWI0ZDAtNDQ4Yi1hNzZmLWIwY2M2M2Q4MTQ5OCJ9.eyJpc3MiOiJodHRwczovL3N0dWRlbnRwZXQtZDRnMHV2MHFvMmQ4MmRjZDAuYXAtc2hhbmdoYWkudGNiLWFwaS50ZW5jZW50Y2xvdWRhcGkuY29tIiwic3ViIjoiYW5vbiIsImF1ZCI6InN0dWRlbnRwZXQtZDRnMHV2MHFvMmQ4MmRjZDAiLCJleHAiOjQwODUyOTIxNTIsImlhdCI6MTc4MTYwODk1Miwibm9uY2UiOiJtMlVaN2pPTVNlS29Ia21ndnJZX1BBIiwiYXRfaGFzaCI6Im0yVVo3ak9NU2VLb0hrbWd2cllfUEEiLCJuYW1lIjoiQW5vbnltb3VzIiwic2NvcGUiOiJhbm9ueW1vdXMiLCJwcm9qZWN0X2lkIjoic3R1ZGVudHBldC1kNGcwdXYwcW8yZDgyZGNkMCIsIm1ldGEiOnsicGxhdGZvcm0iOiJQdWJsaXNoYWJsZUtleSJ9LCJ1c2VyX3R5cGUiOiIiLCJjbGllbnRfdHlwZSI6ImNsaWVudF91c2VyIiwiaXNfc3lzdGVtX2FkbWluIjpmYWxzZX0.J-lWo5sjoUyWjC9NCsxZ6eFFrF2TNSG1l7T3_aBUF6pkqKA87Kj7ca_7JjMgKaDPoDDK8TpxQRBZqXGYFu0YOKfG5hZhhop9xTat5przXcOR0AXApOVCyNTeCcSVuO6vH0dKXtOi2c3JSrU1-NBoH3K7vUDi1jf92QT0N7Zg84hM_TuMy7LMJzTK9cp4fB9hr7X3Jr9HepZ7-UQO2mRPl1Tlk-iALOE7CwqAVCc-kdSi8PKi5AWDgxI7FLiJxY45u4k-Mfu9vmGfIGcCplsTwfAQ2dKszLF7iFDZNIyvRgwkmo6pJjdX8Eb_NqNRZs-lZzZQsRHnCV42sVSm_RB_dQ'
+const TEACHERS_COLLECTION = 'teachers'
+
+// 旧的 JSONBin 配置（仅用于降级）
 const JSONBIN_API_KEY = '$2a$10$WS6YT56shk8/9DD2C/KJY.z2ihUfIIlGnRy/gTdiXmYPESq9cQ256'
 const JSONBIN_BIN_ID = '6a2e6ad9da38895dfebdafcf'
-const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`
+
+let cbApp = null
+let cbDb = null
+
+function initCloudBase() {
+    if (!cbApp) {
+        cbApp = cloudbase.init({
+            env: CB_ENV,
+            region: 'ap-shanghai',
+            accessKey: CB_ACCESS_KEY
+        })
+        cbDb = cbApp.database()
+    }
+    return cbDb
+}
 
 // ============ 查询表单 ============
 function showQueryForm(prefillTeacher, prefillName) {
@@ -376,75 +397,88 @@ function doQuery() {
     fetchAndRender(teacherVal, nameVal)
 }
 
-// ============ 核心：从云端读取并渲染 ============
-function fetchAndRender(targetTeacher, studentNameQuery) {
+// ============ 核心：从腾讯云 CloudBase 读取并渲染 ============
+async function fetchAndRender(targetTeacher, studentNameQuery) {
     document.getElementById('content').innerHTML = `
         <div style="font-size:48px;margin-bottom:12px;animation:pulse 1s infinite;">🔄</div>
         <p class="loading">正在读取 ${targetTeacher} 的数据…</p>
     `
-    fetch(JSONBIN_URL, {
-        headers: { 'X-Access-Key': JSONBIN_API_KEY }
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('读取失败')
-        return response.json()
-    })
-    .then(result => {
-        const allData = result.record || {}
-        let students = []
-        let collection = []
 
-        if (allData.teachers) {
-            if (allData.teachers[targetTeacher]) {
-                // 精确匹配老师名
-                students = allData.teachers[targetTeacher].students || []
-                collection = allData.teachers[targetTeacher].collection || []
-            } else {
-                // 找不到精确老师名，遍历所有老师找该学生名
-                let found = false
-                for (const tName in allData.teachers) {
-                    const s = (allData.teachers[tName].students || []).find(
-                        s => s.name === studentNameQuery
-                    )
-                    if (s) {
-                        students = allData.teachers[tName].students
-                        collection = allData.teachers[tName].collection || []
-                        found = true
-                        break
+    // 优先从 CloudBase 读取
+    let students = []
+    let collection = []
+    let cloudBaseOK = false
+
+    try {
+        const db = initCloudBase()
+        const res = await db.collection(TEACHERS_COLLECTION).doc(targetTeacher).get()
+        const data = res.data || res
+        if (data && data.students) {
+            students = data.students || []
+            collection = data.collection || []
+            cloudBaseOK = true
+        }
+    } catch(err) {
+        console.warn('CloudBase 读取失败:', err)
+    }
+
+    // CloudBase 没找到，降级到 JSONBin
+    if (!cloudBaseOK) {
+        try {
+            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`
+            const res = await fetch(JSONBIN_URL, {
+                headers: { 'X-Access-Key': JSONBIN_API_KEY }
+            })
+            if (res.ok) {
+                const result = await res.json()
+                const allData = result.record || {}
+                if (allData.teachers && allData.teachers[targetTeacher]) {
+                    students = allData.teachers[targetTeacher].students || []
+                    collection = allData.teachers[targetTeacher].collection || []
+                } else if (allData.teachers) {
+                    // 找不到精确老师名，遍历所有老师找该学生名
+                    for (const tName in allData.teachers) {
+                        const s = (allData.teachers[tName].students || []).find(
+                            s => s.name === studentNameQuery
+                        )
+                        if (s) {
+                            students = allData.teachers[tName].students || []
+                            collection = allData.teachers[tName].collection || []
+                            break
+                        }
                     }
-                }
-                if (!found) {
-                    showError(`没有找到「${targetTeacher}」老师的数据<br>
-                        <span style="font-size:12px;color:#999;line-height:2;">
-                            请检查老师名是否正确（比如"菲菲老师"）<br>
-                            或让老师在教师端同步数据后再试
-                        </span>`)
-                    return
+                } else if (allData.students) {
+                    students = allData.students
+                    collection = []
                 }
             }
-        } else if (allData.students) {
-            // 兼容旧格式
-            students = allData.students
-            collection = []
+        } catch(e) {
+            console.warn('JSONBin 降级也失败:', e)
         }
+    }
 
-        const student = students.find(s => s.name === studentNameQuery)
+    // 两个数据源都没数据
+    if (students.length === 0 && !cloudBaseOK) {
+        showError(`没有找到「${targetTeacher}」老师的数据<br>
+            <span style="font-size:12px;color:#999;line-height:2;">
+                请检查老师名是否正确（比如"菲菲老师"）<br>
+                或让老师在教师端同步数据后再试
+            </span>`)
+        return
+    }
 
-        if (!student) {
-            showError(`在「${targetTeacher}」的班级里找不到「${studentNameQuery}」<br>
-                <span style="font-size:12px;color:#999;line-height:2;">
-                    请确认名字是否正确，或让老师检查学生名单
-                </span>`)
-            // 保留已填内容方便修改
-            setTimeout(() => showQueryForm(targetTeacher, studentNameQuery), 2000)
-            return
-        }
+    const student = students.find(s => s.name === studentNameQuery)
 
-        renderStudentPet(student, collection)
-    })
-    .catch(err => {
-        showError('网络连接失败，请检查网络后重试')
-    })
+    if (!student) {
+        showError(`在「${targetTeacher}」的班级里找不到「${studentNameQuery}」<br>
+            <span style="font-size:12px;color:#999;line-height:2;">
+                请确认名字是否正确，或让老师检查学生名单
+            </span>`)
+        setTimeout(() => showQueryForm(targetTeacher, studentNameQuery), 2000)
+        return
+    }
+
+    renderStudentPet(student, collection)
 }
 
 // ============ 从 URL 参数读取（兼容旧链接） ============
