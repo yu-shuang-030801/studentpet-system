@@ -1004,6 +1004,20 @@
             outline: none; border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(74,144,226,0.15);
         }
+        #teacherLoginOverlay .login-select {
+            width: 100%; padding: 14px 16px; font-size: 1.1rem;
+            border: 2px solid var(--gray-light); border-radius: 10px;
+            text-align: center; letter-spacing: 2px;
+            transition: var(--transition);
+            background: white; cursor: pointer; appearance: none;
+            -webkit-appearance: none; -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 16px center;
+        }
+        #teacherLoginOverlay .login-select:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74,144,226,0.15);
+        }
         #teacherLoginOverlay .login-btn {
             margin-top: 18px; width:100%; padding: 14px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -1091,12 +1105,19 @@
     <div id="teacherLoginOverlay">
         <div class="login-card">
             <div class="login-title">📚 化学学习伙伴</div>
-            <div class="login-subtitle">请输入老师名字进入管理界面</div>
-            <input type="text" id="teacherNameInput" class="login-input"
-                   placeholder="例如：菲菲老师" maxlength="20"
-                   onkeydown="if(event.key==='Enter') teacherLogin()">
+            <div class="login-subtitle">请选择你的名字进入管理界面</div>
+            <select id="teacherNameInput" class="login-select" onchange="teacherLogin()">
+                <option value="" disabled selected>👇 请选择老师名字</option>
+                <option value="双双老师">双双老师</option>
+                <option value="菲菲老师">菲菲老师</option>
+                <option value="鑫鑫老师">鑫鑫老师</option>
+                <option value="瀚中老师">瀚中老师</option>
+                <option value="垂馨老师">垂馨老师</option>
+                <option value="桃红老师">桃红老师</option>
+                <option value="慧慧老师">慧慧老师</option>
+                <option value="子川老师">子川老师</option>
+            </select>
             <button class="login-btn" onclick="teacherLogin()">🚀 进入我的班级</button>
-            <div class="login-hint">双双老师、菲菲老师、鑫鑫老师、瀚中老师、垂馨老师、桃红老师、慧慧老师、子川老师</div>
         </div>
     </div>
 
@@ -3393,8 +3414,8 @@ ${petType.emoji[stage.stage]} 学习伴侣 · 好课在线 · 好老师 提升�
     let CURRENT_TEACHER = localStorage.getItem('chemistryTeacherName') || ''
 
     function teacherLogin() {
-        const name = document.getElementById('teacherNameInput').value.trim()
-        if (!name) { alert('请输入老师名字'); return }
+        const name = document.getElementById('teacherNameInput').value
+        if (!name) { alert('请选择老师名字'); return }
         CURRENT_TEACHER = name
         localStorage.setItem('chemistryTeacherName', name)
         document.getElementById('teacherLoginOverlay').style.display = 'none'
@@ -3438,8 +3459,7 @@ ${petType.emoji[stage.stage]} 学习伴侣 · 好课在线 · 好老师 提升�
         CURRENT_TEACHER = ''
         document.getElementById('mainContainer').style.display = 'none'
         document.getElementById('teacherLoginOverlay').style.display = 'flex'
-        document.getElementById('teacherNameInput').value = ''
-        document.getElementById('teacherNameInput').focus()
+        document.getElementById('teacherNameInput').selectedIndex = 0
     }
 
     // 页面加载时检查是否已登录
@@ -3481,7 +3501,15 @@ ${petType.emoji[stage.stage]} 学习伴侣 · 好课在线 · 好老师 提升�
             })
         } else {
             document.getElementById('teacherNameInput').focus()
-        }
+        } else {
+            // 已有登录记录，自动选中下拉框对应项
+            const sel = document.getElementById('teacherNameInput')
+            for (let i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].value === CURRENT_TEACHER) {
+                    sel.selectedIndex = i
+                    break
+                }
+            }
     })
 
     // --- 覆盖 PetSystem 的数据读写，改为按老师隔离 ---
