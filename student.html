@@ -526,6 +526,44 @@ if (encodedData) {
 
 
 // ============ 渲染学生宠物页面 ============
+function buildStudentInfoHtml(student) {
+    let infoItems = []
+    if (student.liveType) infoItems.push(`<span style="background:#E8F5E9;color:#2E7D32;padding:3px 10px;border-radius:12px;font-size:11px;">🏠 ${student.liveType}</span>`)
+    if (student.homeTime) infoItems.push(`<span style="font-size:11px;color:#666;">🕐 在家：${student.homeTime}</span>`)
+    if (student.examTotal || student.examChemRaw || student.examChemAssigned) {
+        let examStr = '📊 考试：'
+        if (student.examTotal) examStr += `总分${student.examTotal}`
+        if (student.examChemRaw) examStr += ` / 化学${student.examChemRaw}`
+        if (student.examChemAssigned) examStr += ` / 赋分${student.examChemAssigned}`
+        infoItems.push(`<span style="font-size:11px;color:#666;">${examStr}</span>`)
+    }
+    if (student.weakAreas) infoItems.push(`<span style="font-size:11px;color:#E65100;">⚠️ 弱势：${student.weakAreas}</span>`)
+    if (student.shuangwei) infoItems.push(`<span style="font-size:11px;color:#666;">📱 双微：${student.shuangwei}</span>`)
+    if (student.preview) infoItems.push(`<span style="font-size:11px;color:#666;">📖 预习：${student.preview}</span>`)
+    if (student.liveClass) infoItems.push(`<span style="font-size:11px;color:#666;">🖥️ 直播课：${student.liveClass}</span>`)
+
+    let contactHtml = ''
+    if (student.contactLog && student.contactLog.length > 0) {
+        contactHtml = `
+            <div style="margin-top:8px;padding:8px;background:#FFF8E1;border-radius:8px;border:1px solid #FFE082;">
+                <div style="font-size:11px;color:#F57F17;font-weight:600;margin-bottom:4px;">📝 沟通记录</div>
+                ${student.contactLog.map(l => `<div style="font-size:10px;color:#666;margin-bottom:2px;">${l.timestamp} - ${l.content}</div>`).join('')}
+            </div>
+        `
+    }
+
+    if (infoItems.length === 0 && !contactHtml) return ''
+    return `
+        <div style="margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(74,144,226,0.04),rgba(157,78,221,0.04));border-radius:12px;border:1px solid rgba(74,144,226,0.1);">
+            <div style="font-size:12px;font-weight:600;color:var(--primary);margin-bottom:8px;">📋 我的信息</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                ${infoItems.join('')}
+            </div>
+            ${contactHtml}
+        </div>
+    `
+}
+
 function renderStudentPet(student, collection) {
     const pet = student.pet
     const petType = PET_TYPES[pet.type] || PET_TYPES.cat
@@ -673,6 +711,8 @@ function renderStudentPet(student, collection) {
         </div>
 
         ${progressHtml}
+
+        ${buildStudentInfoHtml(student)}
 
         <div style="margin-top:18px;">
             <div class="log-title">📝 最近学习记录</div>
