@@ -1278,6 +1278,93 @@
                         </button>
                     </div>
                     
+                    <!-- ===== 新增：学生扩展信息 ===== -->
+                    <div class="comment-panel" id="studentExtInfoPanel">
+                        <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1rem;">📋 学生信息管理</h3>
+                        
+                        <div style="margin-bottom: 12px;">
+                            <label class="form-label">🏠 住宿类型</label>
+                            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                <label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;cursor:pointer;">
+                                    <input type="radio" name="liveType" value="住校"> 住校
+                                </label>
+                                <label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;cursor:pointer;">
+                                    <input type="radio" name="liveType" value="走读"> 走读
+                                </label>
+                                <label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;cursor:pointer;">
+                                    <input type="radio" name="liveType" value="其他"> 其他
+                                </label>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <label class="form-label">🕐 在家时间</label>
+                            <input type="text" id="homeTime" class="form-input" placeholder="例如：周末、假期、每天晚上" style="width:100%;">
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <label class="form-label">📊 最近考试成绩</label>
+                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                                <div>
+                                    <span style="font-size:0.7rem;color:var(--gray);">总分</span>
+                                    <input type="text" id="examTotal" class="form-input" placeholder="总分" style="width:100%;">
+                                </div>
+                                <div>
+                                    <span style="font-size:0.7rem;color:var(--gray);">化学原始分</span>
+                                    <input type="text" id="examChemRaw" class="form-input" placeholder="原始分" style="width:100%;">
+                                </div>
+                                <div>
+                                    <span style="font-size:0.7rem;color:var(--gray);">化学赋分</span>
+                                    <input type="text" id="examChemAssigned" class="form-input" placeholder="赋分" style="width:100%;">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <label class="form-label">⚠️ 弱势板块</label>
+                            <input type="text" id="weakAreas" class="form-input" placeholder="例如：有机化学、化学平衡" style="width:100%;">
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <label class="form-label">📱 是否添加双微</label>
+                            <select id="shuangwei" class="form-select" style="width:100%;">
+                                <option value="">未选择</option>
+                                <option value="是">是</option>
+                                <option value="否（仅加学生）">否（仅加学生）</option>
+                                <option value="否（仅加家长）">否（仅加家长）</option>
+                                <option value="学生家长共用">学生家长共用</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <label class="form-label">📖 是否参加预习</label>
+                            <select id="preview" class="form-select" style="width:100%;">
+                                <option value="">未选择</option>
+                                <option value="是">是</option>
+                                <option value="否">否</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <label class="form-label">🖥️ 是否上直播课</label>
+                            <select id="liveClass" class="form-select" style="width:100%;">
+                                <option value="">未选择</option>
+                                <option value="是">是</option>
+                                <option value="否">否</option>
+                            </select>
+                        </div>
+                        <button onclick="saveStudentExtInfo()" class="btn btn-primary" style="width: 100%; margin-top: 4px; font-size: 0.85rem; padding: 10px;">
+                            💾 保存学生信息
+                        </button>
+                    </div>
+
+                    <!-- ===== 维系记录 ===== -->
+                    <div class="comment-panel" id="contactLogPanel">
+                        <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1rem;">📝 维系记录</h3>
+                        <p style="font-size: 0.75rem; color: var(--gray); margin-bottom: 8px;">
+                            记录与学生及家长的沟通内容
+                        </p>
+                        <textarea id="newContactLog" class="form-textarea" style="min-height: 60px;" placeholder="输入沟通内容，例如：与家长沟通了学习进度..."></textarea>
+                        <button onclick="addContactLog()" class="btn btn-accent" style="width: 100%; margin-top: 8px; font-size: 0.85rem; padding: 10px;">
+                            ➕ 添加维系记录
+                        </button>
+                        <div id="contactLogList" style="margin-top: 10px;"></div>
+                    </div>
+                    
                     <div class="pet-stats">
                         <div class="stat-item">
                             <div class="stat-label">
@@ -1375,6 +1462,7 @@
                     <div class="data-management">
                         <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1rem;">💾 数据管理</h3>
                         <div class="data-buttons">
+                            <button id="undoBtn" class="btn" style="background: linear-gradient(135deg, #FF9F43, #FF6B6B); color: white;" onclick="undoLastAction()">↩️ 撤销上一步</button>
                             <button id="exportCSVData" class="btn btn-secondary">导出所有数据(CSV)</button>
                             <button id="resetData" class="btn btn-danger">重置系统</button>
                         </div>
@@ -1945,6 +2033,9 @@
                 // 加载教师寄语
                 document.getElementById('teacherComment').value = student.pet.teacherComment || ''
                 
+                // 加载学生扩展信息
+                if(typeof loadStudentExtInfo === 'function') loadStudentExtInfo(student)
+                
                 this.updatePetDisplay(student)
                 this.saveData()
             }
@@ -2047,6 +2138,9 @@
             const activity = STUDY_ACTIVITIES[actionType]
             if(!activity) return
             
+            // 撤销快照
+            if(typeof pushUndoState === 'function') pushUndoState()
+            
             const oldStage = this.getEvolutionStage(pet.level).stage
             
             pet.level += activity.exp
@@ -2091,6 +2185,8 @@
             this.saveData()
             this.renderPetsList()
             this.renderClassRanking()
+            student.lastModified = new Date().toLocaleString()
+            if(typeof autoSyncToCloud === 'function') autoSyncToCloud()
         }
         
         changeCurrentPet() {
@@ -2110,13 +2206,17 @@
                 return
             }
             
+            if(typeof pushUndoState === 'function') pushUndoState()
+            
             student.pet.type = petType
             student.pet.gender = gender
             student.pet.name = PET_TYPES[petType].name + '宝宝'
+            student.lastModified = new Date().toLocaleString()
             
             this.updatePetDisplay(student)
             this.saveData()
             this.renderPetsList()
+            if(typeof autoSyncToCloud === 'function') autoSyncToCloud()
             alert('学习伙伴更换成功！')
         }
 
@@ -2142,6 +2242,8 @@
             }
 
             if(!confirm(`确认要给 ${student.name} 换新宠物吗？\n\n旧宠物（${student.pet.name} Lv.${student.pet.level}）将保留在图鉴中，新宠物从 Lv.1 开始养成！`)) return
+
+            if(typeof pushUndoState === 'function') pushUndoState()
 
             // 收录旧宠物到图鉴
             if (!student.pet.collected) {
@@ -2176,9 +2278,11 @@
             })
 
             this.updatePetDisplay(student)
+            student.lastModified = new Date().toLocaleString()
             this.saveData()
             this.renderPetsList()
             renderCollection()
+            if(typeof autoSyncToCloud === 'function') autoSyncToCloud()
             alert('🎉 新宠物已开启！' + student.name + ' 从 Lv.1 开始养 ' + PET_TYPES[petType].name + '宝宝 啦！')
         }
         
@@ -2191,9 +2295,11 @@
             const student = this.students.find(s => s.id === this.currentStudent)
             if(!student) return
             
-            if(!confirm(`确定要删除学生"${student.name}"及其学习伙伴吗？此操作不可恢复！`)) {
+            if(!confirm(`确定要删除学生"${student.name}"及其学习伙伴吗？`)) {
                 return
             }
+
+            if(typeof pushUndoState === 'function') pushUndoState()
             
             const studentIndex = this.students.findIndex(s => s.id === this.currentStudent)
             this.students.splice(studentIndex, 1)
@@ -2201,6 +2307,7 @@
             this.saveData()
             this.renderPetsList()
             this.renderClassRanking()
+            if(typeof autoSyncToCloud === 'function') autoSyncToCloud()
             
             if(this.students.length > 0) {
                 this.currentStudent = this.students[0].id
@@ -2532,13 +2639,14 @@
             }
             
             const csvData = []
-            const headers = ['学生姓名', '班级', '伙伴名字', '伙伴类型', '伙伴性别', '学习等级', '总成长值', '进化阶段', '课堂笔记次数', '巩固练习次数', '完成课程次数', '方程式打卡次数', '每日一题次数', '班级作业次数', '接听视频次数', '元素思维导图次数', '教师寄语']
+            const headers = ['学生姓名', '班级', '伙伴名字', '伙伴类型', '伙伴性别', '学习等级', '总成长值', '进化阶段', '课堂笔记次数', '巩固练习次数', '完成课程次数', '方程式打卡次数', '每日一题次数', '班级作业次数', '接听视频次数', '元素思维导图次数', '教师寄语', '最后变动时间', '住宿类型', '在家时间', '考试总分', '化学原始分', '化学赋分', '弱势板块', '是否添加双微', '是否参加预习', '是否上直播课', '维系记录']
             
             csvData.push(headers.join(','))
             
             this.students.forEach((student) => {
                 const pet = student.pet
                 const evolutionStage = this.getEvolutionStage(pet.level)
+                const contactLogStr = (student.contactLog || []).map(l => `[${l.timestamp}] ${l.content}`).join('；')
                 
                 const row = [
                     student.name,
@@ -2557,8 +2665,19 @@
                     pet.studyStats.composition || 0,
                     pet.studyStats.video || 0,
                     pet.studyStats.dictation || 0,
-                    pet.teacherComment || ''
-                ].map(field => `"${field}"`).join(',')
+                    pet.teacherComment || '',
+                    student.lastModified || '',
+                    student.liveType || '',
+                    student.homeTime || '',
+                    student.examTotal || '',
+                    student.examChemRaw || '',
+                    student.examChemAssigned || '',
+                    student.weakAreas || '',
+                    student.shuangwei || '',
+                    student.preview || '',
+                    student.liveClass || '',
+                    contactLogStr
+                ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
                 
                 csvData.push(row)
             })
@@ -3311,8 +3430,157 @@ ${petType.emoji[stage.stage]} 学习伴侣 · 好课在线 · 好老师 提升�
         if(!student) return
         
         student.pet.teacherComment = document.getElementById('teacherComment').value.trim()
+        student.lastModified = new Date().toLocaleString()
         petSystem.saveData()
+        autoSyncToCloud()
         alert('✅ 寄语已保存，学生端将同步显示')
+    }
+    
+    // ===== 学生扩展信息 =====
+    function saveStudentExtInfo() {
+        if(!petSystem.currentStudent) {
+            alert('请先选择学生')
+            return
+        }
+        const student = petSystem.students.find(s => s.id === petSystem.currentStudent)
+        if(!student) return
+
+        // 住宿类型
+        const liveTypeRadio = document.querySelector('input[name="liveType"]:checked')
+        student.liveType = liveTypeRadio ? liveTypeRadio.value : ''
+        student.homeTime = document.getElementById('homeTime').value.trim()
+        student.examTotal = document.getElementById('examTotal').value.trim()
+        student.examChemRaw = document.getElementById('examChemRaw').value.trim()
+        student.examChemAssigned = document.getElementById('examChemAssigned').value.trim()
+        student.weakAreas = document.getElementById('weakAreas').value.trim()
+        student.shuangwei = document.getElementById('shuangwei').value
+        student.preview = document.getElementById('preview').value
+        student.liveClass = document.getElementById('liveClass').value
+        student.lastModified = new Date().toLocaleString()
+
+        petSystem.saveData()
+        autoSyncToCloud()
+        alert('✅ 学生信息已保存')
+    }
+    
+    function loadStudentExtInfo(student) {
+        // 住宿类型
+        const radios = document.querySelectorAll('input[name="liveType"]')
+        radios.forEach(r => r.checked = (r.value === (student.liveType || ''))
+        document.getElementById('homeTime').value = student.homeTime || ''
+        document.getElementById('examTotal').value = student.examTotal || ''
+        document.getElementById('examChemRaw').value = student.examChemRaw || ''
+        document.getElementById('examChemAssigned').value = student.examChemAssigned || ''
+        document.getElementById('weakAreas').value = student.weakAreas || ''
+        document.getElementById('shuangwei').value = student.shuangwei || ''
+        document.getElementById('preview').value = student.preview || ''
+        document.getElementById('liveClass').value = student.liveClass || ''
+        // 加载维系记录
+        renderContactLog(student)
+    }
+
+    // ===== 维系记录 =====
+    function addContactLog() {
+        if(!petSystem.currentStudent) {
+            alert('请先选择学生')
+            return
+        }
+        const student = petSystem.students.find(s => s.id === petSystem.currentStudent)
+        if(!student) return
+
+        const content = document.getElementById('newContactLog').value.trim()
+        if(!content) { alert('请输入沟通内容'); return }
+
+        if(!student.contactLog) student.contactLog = []
+        student.contactLog.unshift({
+            content: content,
+            timestamp: new Date().toLocaleString()
+        })
+        student.lastModified = new Date().toLocaleString()
+        document.getElementById('newContactLog').value = ''
+        petSystem.saveData()
+        autoSyncToCloud()
+        renderContactLog(student)
+    }
+    
+    function renderContactLog(student) {
+        const container = document.getElementById('contactLogList')
+        if(!student.contactLog || student.contactLog.length === 0) {
+            container.innerHTML = '<p style="font-size:0.75rem;color:var(--gray);">暂无维系记录</p>'
+            return
+        }
+        container.innerHTML = student.contactLog.map((log, i) => `
+            <div style="background:var(--bg);border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:0.8rem;">
+                <div style="color:var(--gray);font-size:0.7rem;margin-bottom:2px;">${log.timestamp}</div>
+                <div style="color:#333;">${log.content}</div>
+                <button onclick="deleteContactLog(${i})" style="float:right;margin-top:-28px;font-size:0.65rem;color:#EF4444;background:none;border:none;cursor:pointer;">删除</button>
+            </div>
+        `).join('')
+    }
+
+    function deleteContactLog(index) {
+        if(!petSystem.currentStudent) return
+        const student = petSystem.students.find(s => s.id === petSystem.currentStudent)
+        if(!student || !student.contactLog) return
+        student.contactLog.splice(index, 1)
+        student.lastModified = new Date().toLocaleString()
+        petSystem.saveData()
+        autoSyncToCloud()
+        renderContactLog(student)
+    }
+
+    // ===== 撤销功能 =====
+    let _undoStack = []
+    const MAX_UNDO = 10
+
+    function pushUndoState() {
+        const snapshot = JSON.parse(JSON.stringify(petSystem.students))
+        _undoStack.push(snapshot)
+        if(_undoStack.length > MAX_UNDO) _undoStack.shift()
+        updateUndoBtn()
+    }
+
+    function undoLastAction() {
+        if(_undoStack.length === 0) {
+            alert('没有可撤销的操作')
+            return
+        }
+        const prev = _undoStack.pop()
+        petSystem.students = prev
+        petSystem.saveData()
+        autoSyncToCloud()
+        petSystem.renderPetsList()
+        petSystem.updateStats()
+        petSystem.renderClassRanking()
+        renderCollection()
+        if(petSystem.currentStudent) {
+            const student = petSystem.students.find(s => s.id === petSystem.currentStudent)
+            if(student) {
+                petSystem.updatePetDisplay(student)
+                loadStudentExtInfo(student)
+            }
+        }
+        updateUndoBtn()
+        alert('✅ 已撤销上一步操作')
+    }
+
+    function updateUndoBtn() {
+        const btn = document.getElementById('undoBtn')
+        if(btn) {
+            btn.textContent = _undoStack.length > 0 
+                ? `↩️ 撤销上一步（剩余${_undoStack.length}次）` 
+                : '↩️ 撤销上一步'
+            btn.style.opacity = _undoStack.length > 0 ? '1' : '0.5'
+        }
+    }
+
+    // ===== 自动同步 =====
+    let _autoSyncTimer = null
+    function autoSyncToCloud() {
+        if(_autoSyncTimer) clearTimeout(_autoSyncTimer)
+        _autoSyncTimer = setTimeout(() => {
+            syncToCloudV2()
+        }, 3000) // 操作后3秒自动同步，避免频繁请求
     }
     
     function generateDailyReport() {
