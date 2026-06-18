@@ -423,7 +423,8 @@ async function fetchAndRender(targetTeacher, studentNameQuery) {
     try {
         const db = initCloudBase()
         const res = await db.collection(TEACHERS_COLLECTION).doc(targetTeacher).get()
-        const data = res.data || res
+        // CloudBase doc().get() 返回 { data: [...] }，data 是数组
+        const data = (res.data && res.data.length > 0) ? res.data[0] : null
         if (data && data.students) {
             students = data.students || []
             collection = data.collection || []
