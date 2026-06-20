@@ -313,18 +313,37 @@ const JSONBIN_API_KEY = '$2a$10$WS6YT56shk8/9DD2C/KJY.z2ihUfIIlGnRy/gTdiXmYPESq9
 const JSONBIN_BIN_ID = '6a2e6ad9da38895dfebdafcf'
 
 let cbApp = null
-let cbDb = null
+let _cbAuthDone = false
 
-function initCloudBase() {
+function getCbApp() {
     if (!cbApp) {
+        if (typeof cloudbase === 'undefined') {
+            throw new Error('CloudBase SDK 未加载')
+        }
         cbApp = cloudbase.init({
             env: CB_ENV,
-            region: 'ap-shanghai',
             accessKey: CB_ACCESS_KEY
         })
-        cbDb = cbApp.database()
     }
-    return cbDb
+    return cbApp
+}
+
+function getCbDb() {
+    return getCbApp().database()
+}
+
+async function ensureCloudAuth() {
+    if (_cbAuthDone) return
+    try {
+        const app = getCbApp()
+        const auth = app.auth()
+        await auth.signInAnonymously()
+        _cbAuthDone = true
+        console.log('✅ 学生端匿名登录成功')
+    } catch(e) {
+        console.warn('匿名登录失败（可能已登录）:', e.message)
+        _cbAuthDone = true
+    }
 }
 
 // ============ 查询表单 ============
@@ -421,7 +440,8 @@ async function fetchAndRender(targetTeacher, studentNameQuery) {
     let cloudBaseOK = false
 
     try {
-        const db = initCloudBase()
+        await ensureCloudAuth()  // 先确保已登录
+        const db = getCbDb()
         const res = await db.collection(TEACHERS_COLLECTION).doc(targetTeacher).get()
         // CloudBase doc().get() 返回 { data: [...] }，data 是数组
         const data = (res.data && res.data.length > 0) ? res.data[0] : null
