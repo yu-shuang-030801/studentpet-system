@@ -1156,7 +1156,7 @@
 
         <div class="header">
             <h1 class="game-title">学习伴侣 | 好课在线 | 好老师 提升快</h1>
-            <p class="subtitle">Chemistry Learning Partner | 学习任务养成系统 | 支持200名学生 | 成长值=等级 | 6阶段进化</p>
+            <p class="subtitle">Chemistry Learning Partner | 学习任务养成系统 | 支持300名学生 | 成长值=等级 | 6阶段进化</p>
         </div>
         
                 <div class="dashboard">
@@ -1621,7 +1621,7 @@
 
         
         <div class="footer">
-            <p>学习伴侣 | 好课在线 | 好老师 提升快 | 老师专用版 | 支持最多200名学生 | 成长值=等级 | 6阶段进化系统</p>
+            <p>学习伴侣 | 好课在线 | 好老师 提升快 | 老师专用版 | 支持最多300名学生 | 成长值=等级 | 6阶段进化系统</p>
         </div>
     </div>
     
@@ -1678,7 +1678,7 @@
                 <h4>⚠️ 注意事项</h4>
                 <ul>
                     <li>文件大小不超过1MB</li>
-                    <li>最多支持200名学生</li>
+                    <li>最多支持300名学生</li>
                     <li>建议使用Excel或文本编辑器创建CSV文件</li>
                     <li>保存文件时选择"CSV UTF-8"编码</li>
                 </ul>
@@ -2010,8 +2010,8 @@
                 return
             }
             
-            if(this.students.length + studentNames.length > 200) {
-                alert(`无法添加${studentNames.length}名学生，当前已有${this.students.length}名学生，最多支持200名`)
+            if(this.students.length + studentNames.length > 300) {
+                alert(`无法添加${studentNames.length}名学生，当前已有${this.students.length}名学生，最多支持300名`)
                 return
             }
             
@@ -3254,8 +3254,8 @@
                     updatedCount++
                     detailedResults.push(`🔄 ${studentData.name} (${studentData.class}): 已更新数据`)
                 } else {
-                    if(this.students.length >= 200) {
-                        warnings.push(`已达到200名学生上限，无法添加更多学生`)
+                    if(this.students.length >= 300) {
+                        warnings.push(`已达到300名学生上限，无法添加更多学生`)
                         return
                     }
                     
