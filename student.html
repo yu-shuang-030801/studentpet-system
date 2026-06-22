@@ -247,14 +247,14 @@ body {
 <script>
 // 宠物类型定义（和教师端一致）
 const PET_TYPES = {
-    cat: { name: '阿伏伽德罗喵', emoji: ['🐱','🐈','🐅','🦁','🐈‍⬛','😺'], color: ['#FFB347','#FF8C42','#FF6B6B','#FF4757','#E74C3C','#C0392B'] },
-    dog: { name: '氧化汪', emoji: ['🐶','🐕','🦮','🐺','🐕‍🦺','🐕‍⬛'], color: ['#4ECDC4','#45B7D1','#2E9CCA','#1F77B7','#1A5276','#154360'] },
-    dragon: { name: '钠钠龙', emoji: ['🐲','🐉','🐲','🐉','🐲','🐉'], color: ['#96CEB4','#88D8B0','#7BCBAE','#6EC2A8','#5DAE9E','#4D9486'] },
-    shrimp: { name: '氯氯虾', emoji: ['🦐','🦐','🦐','🦐','🦐','🦐'], color: ['#FF9A8B','#FF7E5F','#FF6B6B','#FF5A5A','#E74C3C','#C0392B'] },
-    rabbit: { name: '镁镁兔', emoji: ['🐰','🐇','🐰','🐇','🐰','🐇'], color: ['#DDA0DD','#DA70D6','#C71585','#BA55D3','#9B59B6','#8E44AD'] },
-    panda: { name: '方程式熊猫', emoji: ['🐼','🐼','🐼','🐼','🐼','🐼'], color: ['#A9CCE3','#7FB3D5','#5499C7','#2980B9','#2471A3','#1A5276'] },
-    fox: { name: '镁铝狐', emoji: ['🦊','🦊','🦊','🦊','🦊','🦊'], color: ['#FFB347','#FF8C42','#FF6B6B','#FF4757','#E74C3C','#C0392B'] },
-    bird: { name: '气体啾', emoji: ['🐦','🐧','🦅','🦅','🦅','🦅'], color: ['#ABEBC6','#82E0AA','#58D68D','#2ECC71','#27AE60','#1E8449'] }
+    cat: { name: '阿伏伽德罗喵', emoji: ['🐱','🐈','🐅','🦁','🐈‍⬛','😺'], color: ['#FFB347','#FF8C42','#FF6B6B','#FF4757','#E74C3C','#C0392B'], images: ['images/cat/cat_stage0.jpg','images/cat/cat_stage1.jpg','images/cat/cat_stage2.jpg','images/cat/cat_stage3.jpg','images/cat/cat_stage4.jpg','images/cat/cat_stage5.jpg'] },
+    dog: { name: '氧化汪', emoji: ['🐶','🐕','🦮','🐺','🐕‍🦺','🐕‍⬛'], color: ['#4ECDC4','#45B7D1','#2E9CCA','#1F77B7','#1A5276','#154360'], images: ['images/dog/dog_stage0.jpg','images/dog/dog_stage1.jpg','images/dog/dog_stage2.jpg','images/dog/dog_stage3.jpg','images/dog/dog_stage4.jpg','images/dog/dog_stage5.jpg'] },
+    dragon: { name: '推断企鹅', emoji: ['🐧','🐧','企鹅','企鹅','企鹅','企鹅'], color: ['#96CEB4','#88D8B0','#7BCBAE','#6EC2A8','#5DAE9E','#4D9486'], images: ['images/dragon/dragon_stage0.jpg','images/dragon/dragon_stage1.jpg','images/dragon/dragon_stage2.jpg','images/dragon/dragon_stage3.jpg','images/dragon/dragon_stage4.jpg','images/dragon/dragon_stage5.jpg'] },
+    shrimp: { name: '焰色虎', emoji: ['🐯','虎','虎','虎','虎','虎'], color: ['#FF9A8B','#FF7E5F','#FF6B6B','#FF5A5A','#E74C3C','#C0392B'], images: ['images/shrimp/shrimp_stage0.jpg','images/shrimp/shrimp_stage1.jpg','images/shrimp/shrimp_stage2.jpg','images/shrimp/shrimp_stage3.jpg','images/shrimp/shrimp_stage4.jpg','images/shrimp/shrimp_stage5.jpg'] },
+    rabbit: { name: '镁镁兔', emoji: ['🐰','🐇','🐰','🐇','🐰','🐇'], color: ['#DDA0DD','#DA70D6','#C71585','#BA55D3','#9B59B6','#8E44AD'], images: ['images/rabbit/rabbit_stage0.jpg','images/rabbit/rabbit_stage1.jpg','images/rabbit/rabbit_stage2.jpg','images/rabbit/rabbit_stage3.jpg','images/rabbit/rabbit_stage4.jpg','images/rabbit/rabbit_stage5.jpg'] },
+    panda: { name: '方程式熊猫', emoji: ['🐼','🐼','🐼','🐼','🐼','🐼'], color: ['#A9CCE3','#7FB3D5','#5499C7','#2980B9','#2471A3','#1A5276'], images: ['images/panda/panda_stage0.jpg','images/panda/panda_stage1.jpg','images/panda/panda_stage2.jpg','images/panda/panda_stage3.jpg','images/panda/panda_stage4.jpg','images/panda/panda_stage5.jpg'] },
+    fox: { name: '镁铝狐', emoji: ['🦊','🦊','🦊','🦊','🦊','🦊'], color: ['#FFB347','#FF8C42','#FF6B6B','#FF4757','#E74C3C','#C0392B'], images: ['images/fox/fox_stage0.jpg','images/fox/fox_stage1.jpg','images/fox/fox_stage2.jpg','images/fox/fox_stage3.jpg','images/fox/fox_stage4.png','images/fox/fox_stage5.jpg'] },
+    bird: { name: '平衡啾', emoji: ['🐦','企鹅','🦅','🦅','🦅','🦅'], color: ['#ABEBC6','#82E0AA','#58D68D','#2ECC71','#27AE60','#1E8449'], images: ['images/bird/bird_stage0.jpg','images/bird/bird_stage1.jpg','images/bird/bird_stage2.jpg','images/bird/bird_stage3.jpg','images/bird/bird_stage4.jpg','images/bird/bird_stage5.jpg'] }
 }
 
 const STUDY_ACTIVITIES = {
@@ -269,22 +269,21 @@ const STUDY_ACTIVITIES = {
 }
 
 function getEvolutionStage(level) {
-    if(level >= 80) return { stage: 5, text: '💎 化学超能大神', color: '#E74C3C' }
-    if(level >= 50) return { stage: 4, text: '👑 元素小王者', color: '#2ECC71' }
-    if(level >= 30) return { stage: 3, text: '🔥 反应小先锋', color: '#FF9F43' }
-    if(level >= 15) return { stage: 2, text: '🌟 方程式达人', color: '#FF6B6B' }
-    if(level >= 5) return { stage: 1, text: '✨ 微粒小能手', color: '#9D4EDD' }
+    if(level >= 90) return { stage: 5, text: '💎 化学超能大神', color: '#E74C3C' }
+    if(level >= 60) return { stage: 4, text: '👑 元素小王者', color: '#2ECC71' }
+    if(level >= 40) return { stage: 3, text: '🔥 反应小先锋', color: '#FF9F43' }
+    if(level >= 25) return { stage: 2, text: '🌟 方程式达人', color: '#FF6B6B' }
+    if(level >= 10) return { stage: 1, text: '✨ 微粒小能手', color: '#9D4EDD' }
     return { stage: 0, text: '⭐ 化学小萌新', color: '#4A90E2' }
 }
 const MAX_LEVEL = 100
-const STAGE_THRESHOLDS = [0, 5, 15, 30, 50, 80]
+const STAGE_THRESHOLDS = [0, 10, 25, 40, 60, 90]
 
 function getMood(level) {
-    if(level >= 80) return '状态极佳，学习力爆棚 🚀\n我的主人太厉害了！'
-    if(level >= 50) return '已经进入学习高手模式 💪\n继续冲，我看好你！'
-    if(level >= 30) return '进步飞快，越来越厉害了 🌟\n坚持就是胜利！'
-    if(level >= 15) return '正在稳步成长中 ✨\n每一步都算数！'
-    if(level >= 5) return '刚刚起步，加油哦 💡\n我会陪你一起进步！'
+    if(level >= 60) return '状态极佳，学习力爆棚 🚀\n我的主人太厉害了！'
+    if(level >= 40) return '已经进入学习高手模式 💪\n继续冲，我看好你！'
+    if(level >= 25) return '进步飞快，越来越厉害了 🌟\n坚持就是胜利！'
+    if(level >= 10) return '正在稳步成长中 ✨\n每一步都算数！'
     return '等待主人带我升级 🌱\n快来学习吧！'
 }
 
@@ -589,6 +588,7 @@ function renderStudentPet(student, collection) {
     const pet = student.pet
     const petType = PET_TYPES[pet.type] || PET_TYPES.cat
     const stage = getEvolutionStage(pet.level)
+    const imgSrc = petType.images[stage.stage]
     const emoji = petType.emoji[stage.stage]
     const color = petType.color[stage.stage]
     const mood = getMood(pet.level)
@@ -669,7 +669,7 @@ function renderStudentPet(student, collection) {
             const t = PET_TYPES[item.petType] || PET_TYPES.cat
             cardsHtml += `
                 <div class="collection-card maxed">
-                    <div class="collect-emoji">${t.emoji[5] || '🏆'}</div>
+                    <div class="collect-emoji"><img src="${t.images[5]}" style="width:36px;height:36px;object-fit:contain;" alt="${t.name}" onerror="this.style.display='none';this.parentNode.textContent='${t.emoji[5] || '🏆'}';"></div>
                     <div class="collect-name">${item.petName}</div>
                     <span class="collect-badge">🏆 已收集</span>
                 </div>
@@ -716,10 +716,10 @@ function renderStudentPet(student, collection) {
 
     document.getElementById('content').innerHTML = `
         <div class="pet-avatar" style="background:linear-gradient(135deg,${color},#FFD166);">
-            ${emoji}
+            <img src="${imgSrc}" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" alt="${petType.name}" onerror="this.style.display='none';this.parentNode.textContent='${emoji}';">
         </div>
         <div class="pet-name">${pet.name}</div>
-        <div class="pet-type">${emoji} ${petType.name}</div>
+        <div class="pet-type"><img src="${imgSrc}" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;" alt="${petType.name}" onerror="this.style.display='none';this.parentNode.textContent='${emoji}';"> ${petType.name}</div>
         <div class="level">Lv.${pet.level}　成长值：${pet.level}</div>
         <div class="stage" style="color:${stage.color};">${stage.text}</div>
 
