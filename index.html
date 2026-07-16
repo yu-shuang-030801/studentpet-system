@@ -1138,7 +1138,9 @@
                 <option value="垂馨老师">垂馨老师</option>
                 <option value="桃红老师">桃红老师</option>
                 <option value="慧慧老师">慧慧老师</option>
-                <option value="子川老师">子川老师</option>
+                <option value="小李老师">小李老师</option>
+                <option value="小亮老师">小亮老师</option>
+                <option value="小树老师">小树老师</option>
             </select>
             <button class="login-btn" onclick="teacherLogin()">🚀 进入我的班级</button>
         </div>
@@ -1694,7 +1696,9 @@
                     <li>文件大小不超过1MB</li>
                     <li>最多支持300名学生</li>
                     <li>建议使用Excel或文本编辑器创建CSV文件</li>
-                    <li>保存文件时选择"CSV UTF-8"编码</li>
+                    <li><strong>用Excel编辑后保存时，请选择"CSV UTF-8 (逗号分隔)"格式</strong></li>
+                    <li>系统已支持自动识别UTF-8和GBK编码、自动识别逗号和分号分隔符</li>
+                    <li>导出的CSV可以直接重新导入，扩展字段也会自动识别</li>
                 </ul>
             </div>
         </div>
@@ -2831,28 +2835,54 @@
                 return
             }
             
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                try {
-                    this.parseCSVData(e.target.result)
-                } catch(error) {
-                    console.error('CSV解析错误:', error)
-                    alert('CSV文件解析失败，请检查文件格式是否正确')
+            // 先用UTF-8读取，检测是否需要切换GBK编码
+            const readerUtf8 = new FileReader()
+            readerUtf8.onload = (e) => {
+                const utf8Text = e.target.result
+                // 如果UTF-8解码出现替换字符，说明文件可能是GBK/GB2312编码
+                if(utf8Text.includes('\uFFFD')) {
+                    const readerGbk = new FileReader()
+                    readerGbk.onload = (ev) => {
+                        try {
+                            this.parseCSVData(ev.target.result)
+                        } catch(error) {
+                            console.error('CSV解析错误:', error)
+                            alert('CSV文件解析失败，请检查文件格式。如果用Excel编辑过，请保存时选择"CSV UTF-8"格式')
+                        }
+                    }
+                    readerGbk.onerror = () => {
+                        alert('读取文件失败，请重试')
+                        event.target.value = ''
+                    }
+                    readerGbk.readAsText(file, 'GBK')
+                } else {
+                    try {
+                        this.parseCSVData(utf8Text)
+                    } catch(error) {
+                        console.error('CSV解析错误:', error)
+                        alert('CSV文件解析失败，请检查文件格式是否正确')
+                    }
                 }
             }
             
-            reader.onerror = () => {
+            readerUtf8.onerror = () => {
                 alert('读取文件失败，请重试')
                 event.target.value = ''
             }
             
-            reader.readAsText(file, 'UTF-8')
+            readerUtf8.readAsText(file, 'UTF-8')
+            event.target.value = ''
         }
         
         parseCSVData(csvText) {
             if(!csvText || csvText.trim() === '') {
                 alert('CSV文件为空')
                 return
+            }
+            
+            // 移除BOM头（\uFEFF）
+            if(csvText.charCodeAt(0) === 0xFEFF) {
+                csvText = csvText.substring(1)
             }
             
             const results = []
@@ -2866,7 +2896,13 @@
             }
             
             const headerLine = lines[0]
-            const headers = this.parseCSVLine(headerLine)
+            
+            // 自动检测分隔符（逗号或分号，Excel有时用分号）
+            const commaCount = (headerLine.match(/,/g) || []).length
+            const semicolonCount = (headerLine.match(/;/g) || []).length
+            const delimiter = semicolonCount > commaCount ? ';' : ','
+            
+            const headers = this.parseCSVLine(headerLine, delimiter)
             
             if(headers.length === 0) {
                 alert('无法解析CSV表头')
@@ -2875,7 +2911,7 @@
             
             const studentNameIndex = headers.findIndex(h => this.normalizeFieldName(h) === '学生姓名')
             if(studentNameIndex === -1) {
-                alert('CSV文件中必须包含"学生姓名"列')
+                alert('CSV文件中必须包含"学生姓名"列\n\n检测到的表头：' + headers.join(' | '))
                 return
             }
             
@@ -2886,7 +2922,7 @@
                 if(line === '' || line.startsWith('#')) continue
                 
                 try {
-                    const columns = this.parseCSVLine(line)
+                    const columns = this.parseCSVLine(line, delimiter)
                     if(columns.length === 0) continue
                     
                     const studentData = this.parseStudentRow(columns, fieldMapping, i)
@@ -2907,7 +2943,8 @@
             this.processImportResults(results, errors, warnings)
         }
         
-        parseCSVLine(line) {
+        parseCSVLine(line, delimiter) {
+            delimiter = delimiter || ','
             const result = []
             let inQuotes = false
             let current = ''
@@ -2916,7 +2953,7 @@
                 const char = line[i]
                 if(char === '"') {
                     inQuotes = !inQuotes
-                } else if(char === ',' && !inQuotes) {
+                } else if(char === delimiter && !inQuotes) {
                     result.push(current.trim())
                     current = ''
                 } else {
@@ -2977,7 +3014,7 @@
                 'vocabulary': '方程式打卡次数',
                 '每日一题次数': '每日一题次数',
                 '每日一题': '每日一题次数',
-                'dailyQuestion': '每日一题次数',
+                'dailyquestion': '每日一题次数',
                 'daily question': '每日一题次数',
                 '班级作业次数': '班级作业次数',
                 '化学作文次数': '班级作业次数',
@@ -2993,19 +3030,33 @@
                 '教师寄语': '教师寄语',
                 '寄语': '教师寄语',
                 'teacher comment': '教师寄语',
-                'comment': '教师寄语'
+                'comment': '教师寄语',
+                '最后变动时间': '最后变动时间',
+                '填写时间': '填写时间',
+                '高中性质': '高中性质',
+                '用户分层': '用户分层',
+                '意向选科': '意向选科',
+                '住宿类型': '住宿类型',
+                '在家时间': '在家时间',
+                '考试总分': '考试总分',
+                '化学原始分': '化学原始分',
+                '化学赋分': '化学赋分',
+                '弱势板块': '弱势板块',
+                '是否添加双微': '是否添加双微',
+                '是否参加预习': '是否参加预习',
+                '是否上直播课': '是否上直播课',
+                '是否创建三人小群': '是否创建三人小群',
+                '维系记录': '维系记录'
             }
             
             const normalized = field.trim().toLowerCase()
             for(const [key, value] of Object.entries(fieldMap)) {
-                if(key.toLowerCase() === normalized || 
-                   field.includes(key) || 
-                   key.includes(normalized)) {
+                if(key.toLowerCase() === normalized) {
                     return value
                 }
             }
             
-            return field
+            return field.trim()
         }
         
         createFieldMapping(headers) {
@@ -3111,6 +3162,30 @@
             if(fieldMapping['教师寄语'] !== undefined && columns[fieldMapping['教师寄语']]) {
                 student.pet.teacherComment = columns[fieldMapping['教师寄语']].trim()
             }
+            
+            // 扩展信息字段导入
+            const extFields = [
+                ['最后变动时间', 'lastModified'],
+                ['填写时间', 'fillTime'],
+                ['高中性质', 'schoolType'],
+                ['用户分层', 'userLevel'],
+                ['意向选科', 'subjectChoice'],
+                ['住宿类型', 'liveType'],
+                ['在家时间', 'homeTime'],
+                ['考试总分', 'examTotal'],
+                ['化学原始分', 'examChemRaw'],
+                ['化学赋分', 'examChemAssigned'],
+                ['弱势板块', 'weakAreas'],
+                ['是否添加双微', 'shuangwei'],
+                ['是否参加预习', 'preview'],
+                ['是否上直播课', 'liveClass'],
+                ['是否创建三人小群', 'trioGroup']
+            ]
+            extFields.forEach(([fieldName, propName]) => {
+                if(fieldMapping[fieldName] !== undefined && columns[fieldMapping[fieldName]]) {
+                    student[propName] = columns[fieldMapping[fieldName]].trim()
+                }
+            })
             
             if(!student.pet.name) {
                 const petType = student.pet.type || this.getRandomPetType()
@@ -3267,14 +3342,6 @@
                 )
                 
                 if(existingIndex !== -1) {
-                    const existingStudent = this.students[existingIndex]
-                    
-                    if(!this.confirmOverwrite(studentData.name, studentData.class)) {
-                        skippedCount++
-                        detailedResults.push(`⚠️ ${studentData.name} (${studentData.class}): 已存在，跳过`)
-                        return
-                    }
-                    
                     this.students[existingIndex] = studentData
                     updatedCount++
                     detailedResults.push(`🔄 ${studentData.name} (${studentData.class}): 已更新数据`)
@@ -3298,7 +3365,7 @@
         }
         
         confirmOverwrite(name, className) {
-            return confirm(`学生 ${name} (${className}) 已存在，是否覆盖现有数据？\n点击"确定"覆盖，点击"取消"跳过。`)
+            return true
         }
         
         showCSVImportResults(added, updated, skipped, total, errors, warnings, details) {
