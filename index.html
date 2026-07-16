@@ -3340,14 +3340,6 @@
                 )
                 
                 if(existingIndex !== -1) {
-                    const existingStudent = this.students[existingIndex]
-                    
-                    if(!this.confirmOverwrite(studentData.name, studentData.class)) {
-                        skippedCount++
-                        detailedResults.push(`⚠️ ${studentData.name} (${studentData.class}): 已存在，跳过`)
-                        return
-                    }
-                    
                     this.students[existingIndex] = studentData
                     updatedCount++
                     detailedResults.push(`🔄 ${studentData.name} (${studentData.class}): 已更新数据`)
@@ -3371,7 +3363,7 @@
         }
         
         confirmOverwrite(name, className) {
-            return confirm(`学生 ${name} (${className}) 已存在，是否覆盖现有数据？\n点击"确定"覆盖，点击"取消"跳过。`)
+            return true
         }
         
         showCSVImportResults(added, updated, skipped, total, errors, warnings, details) {
