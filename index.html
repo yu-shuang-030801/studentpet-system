@@ -1509,9 +1509,9 @@
                 <h2 class="panel-title">👥 批量成长操作</h2>
                 
                 <div class="batch-input-group">
-                    <label class="form-label">学生姓名（用逗号或换行分隔，最多100个）</label>
+                    <label class="form-label">学生姓名（用逗号或换行分隔，最多250个）</label>
                     <textarea id="batchOperationNames" class="batch-textarea" placeholder="例如：张三, 李四, 王五&#10;或者：&#10;张三&#10;李四&#10;王五"></textarea>
-                    <div class="batch-hint">一次最多可操作100名学生</div>
+                    <div class="batch-hint">一次最多可操作250名学生</div>
                 </div>
                 
                 <div class="batch-input-group">
@@ -2595,8 +2595,8 @@
                 return
             }
             
-            if(studentNames.length > 100) {
-                alert('一次最多操作100名学生')
+            if(studentNames.length > 250) {
+                alert('一次最多操作250名学生')
                 return
             }
             
